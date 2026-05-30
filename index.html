@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手搖職人 Bubble Tea Master - 每日解鎖版</title>
+    <title>手搖職人 Bubble Tea Master</title>
     <style>
         :root {
             --sky: #87CEEB;
@@ -21,7 +21,112 @@
             display: flex;
             justify-content: center;
         }
+        
+        /* 開始與教學畫面共用背景 */
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 30, 30, 0.95);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .start-content {
+            background: #2a2a2a;
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 2px solid var(--accent);
+        }
+        .start-content h1 {
+            text-align: center;
+            color: var(--accent);
+            margin-top: 0;
+            border-bottom: 2px solid #555;
+            padding-bottom: 15px;
+        }
+        .start-content h3 { color: #4db6ac; margin-bottom: 10px; }
+        .start-content ul { line-height: 1.6; margin-bottom: 20px; }
+        
+        /* 標題畫面特有樣式 */
+        #title-content {
+            text-align: center;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+        #title-content h1 {
+            font-size: 4rem;
+            border: none;
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            color: #ccc;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+        }
+        
+        /* 配方表樣式 */
+        .recipe-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 25px 0;
+            background: white;
+            color: #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .recipe-table th, .recipe-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .recipe-table th { background: var(--accent); color: white; text-align: center; }
+        .recipe-table td:nth-child(1) { text-align: center; font-weight: bold; }
+        
+        /* 遊戲按鈕樣式與動畫 */
+        .start-btn {
+            display: block;
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .start-btn:hover { background: #e64a19; transform: scale(1.02); }
+        
+        .pulse-btn {
+            width: 60%;
+            margin: 0 auto;
+            font-size: 2rem;
+            padding: 20px;
+            border-radius: 50px;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 112, 67, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0); }
+        }
+
+        /* 遊戲主體隱藏直到開始 */
         #game-container {
+            display: none;
             width: 100%;
             max-width: 900px;
             background: var(--ui-bg);
@@ -184,11 +289,60 @@
             min-height: 25px;
         }
         
-        /* 隱藏未解鎖的庫存文字 */
         .inv-wrap { display: none; }
     </style>
 </head>
 <body>
+
+<div id="start-screen">
+    
+    <div class="start-content" id="title-content">
+        <h1>🥤 手搖職人<br>Bubble Tea Master</h1>
+        <div class="subtitle">經營你的專屬店面，挑戰手搖飲的最速傳說！</div>
+        <button class="start-btn pulse-btn" onclick="showTutorial()">開始遊戲</button>
+    </div>
+
+    <div class="start-content" id="tutorial-content" style="display: none;">
+        <h1 style="font-size: 2.5rem;">📖 新手店長指南</h1>
+        
+        <h3>🎯 遊戲目的</h3>
+        <p>你是一位剛上工的飲品店員，必須在營業時間內賺取最大利潤。妥善分配備料與出餐的時間，是經營成功的關鍵。</p>
+        
+        <h3>🕹️ 操作方式</h3>
+        <ul>
+            <li><strong>早上 9:00 備料：</strong> 點擊「備料區」補充庫存，每種材料花費的時間不同。</li>
+            <li><strong>早上 9:30 營業：</strong> 依照客人頭上的對話框點單，在「調製區」點擊對應配料。</li>
+            <li><strong>出餐與重做：</strong> 系統會自動預測你調配的飲料，無誤後點擊「完成出餐」。加錯請點「倒掉重做」。</li>
+        </ul>
+
+        <h3>📜 飲料製作表 (配方秘笈)</h3>
+        <table class="recipe-table">
+            <tr>
+                <th>解鎖日</th>
+                <th>品項名稱</th>
+                <th>需要配料</th>
+            </tr>
+            <tr>
+                <td>第 1 天</td>
+                <td>純粹紅茶<br>珍珠奶茶<br>紅茶拿鐵</td>
+                <td>紅茶 + 冰塊<br>珍珠 + 鮮奶 + 紅茶 + 冰塊<br>鮮奶 + 紅茶 + 冰塊</td>
+            </tr>
+            <tr>
+                <td>第 2 天</td>
+                <td>蘋果紅萱</td>
+                <td>蘋果 + 紅茶 + 冰塊</td>
+            </tr>
+            <tr>
+                <td>第 3 天</td>
+                <td>炸地瓜球</td>
+                <td>地瓜球</td>
+            </tr>
+        </table>
+
+        <button class="start-btn" onclick="initGame()">我知道了，開始營業！</button>
+    </div>
+
+</div>
 
 <div id="game-container">
     <div class="header">
@@ -197,15 +351,14 @@
         <div>💰 營業額: $<span id="money-display">500</span></div>
     </div>
     
-    <div class="sys-msg" id="sys-message">早安！現在是早上 9 點，材料需要時間準備，請盡快備料！</div>
+    <div class="sys-msg" id="sys-message">早安！現在是早上 9 點，9點半即將開門，請發揮手速盡快備料！</div>
 
     <div class="shop-scene">
         <div class="staff" id="staff-char">🧑‍🍳</div>
         <div class="making-cup" id="cup-visual"></div>
         <div class="counter"></div>
         
-        <div class="customer-queue" id="customer-queue">
-            </div>
+        <div class="customer-queue" id="customer-queue"></div>
     </div>
 
     <div class="controls-area">
@@ -215,17 +368,16 @@
                 <button class="prep-btn" onclick="prepItem('tea', this)">🍵 泡紅茶 (-$50)</button>
                 <button class="prep-btn" onclick="prepItem('boba', this)">🧋 煮珍珠 (-$80)</button>
                 <button class="prep-btn" onclick="prepItem('ice', this)">🧊 製冰 (-$20)</button>
+                <button class="prep-btn" id="prep-milk" onclick="prepItem('milk', this)">🥛 備鮮奶 (-$90)</button>
                 
                 <button class="prep-btn" id="prep-apple" style="display: none;" onclick="prepItem('apple', this)">🍎 切蘋果 (-$60)</button>
                 <button class="prep-btn" id="prep-spb" style="display: none;" onclick="prepItem('spb', this)">🍠 炸地瓜球 (-$70)</button>
-                <button class="prep-btn" id="prep-milk" style="display: none;" onclick="prepItem('milk', this)">🥛 備鮮奶 (-$90)</button>
             </div>
             
             <p style="font-size: 0.9rem; color: #666; margin-top: 15px; line-height: 1.8;">
-                庫存：紅茶(<span id="inv-tea">0</span>) | 珍珠(<span id="inv-boba">0</span>) | 冰塊(<span id="inv-ice">0</span>)
+                庫存：紅茶(<span id="inv-tea">0</span>) | 珍珠(<span id="inv-boba">0</span>) | 冰塊(<span id="inv-ice">0</span>) | 鮮奶(<span id="inv-milk">0</span>)
                 <span id="inv-apple-wrap" class="inv-wrap"> | 蘋果(<span id="inv-apple">0</span>)</span>
                 <span id="inv-spb-wrap" class="inv-wrap"> | 地瓜球(<span id="inv-spb">0</span>)</span>
-                <span id="inv-milk-wrap" class="inv-wrap"> | 鮮奶(<span id="inv-milk">0</span>)</span>
             </p>
         </div>
 
@@ -235,10 +387,10 @@
                 <button onclick="addIngredient('紅茶')" class="ing-btn" disabled>加紅茶</button>
                 <button onclick="addIngredient('珍珠')" class="ing-btn" disabled>加珍珠</button>
                 <button onclick="addIngredient('冰塊')" class="ing-btn" disabled>加冰塊</button>
+                <button onclick="addIngredient('鮮奶')" class="ing-btn" id="add-milk" disabled>加鮮奶</button>
                 
                 <button onclick="addIngredient('蘋果')" class="ing-btn" id="add-apple" style="display: none;" disabled>加蘋果</button>
                 <button onclick="addIngredient('地瓜球')" class="ing-btn" id="add-spb" style="display: none;" disabled>裝地瓜球</button>
-                <button onclick="addIngredient('鮮奶')" class="ing-btn" id="add-milk" style="display: none;" disabled>加鮮奶</button>
             </div>
             <div style="margin-top: 10px; font-weight: bold; color: #555;">
                 目前加入: <span id="cup-preview">空</span>
@@ -260,9 +412,10 @@
 <script>
     let gameState = {
         day: 1,
+        // 【修改】每天起始時間為 9:00 (9 * 60)
         time: 9 * 60, 
         money: 500,
-        inventory: { tea: 0, boba: 0, ice: 0, apple: 0, spb: 0, milk: 0 },
+        inventory: { tea: 0, boba: 0, ice: 0, milk: 0, apple: 0, spb: 0 },
         isOpen: false,
         isEnded: false,
         timer: null
@@ -271,14 +424,12 @@
     let currentCup = [];
     let currentOrders = [];
     
-    // 【修改】為每個配方加上了 unlockDay (解鎖天數)
     const RECIPES = [
         { name: "純粹紅茶", ingredients: ["紅茶", "冰塊"], price: 35, unlockDay: 1 },
-        { name: "珍珠奶茶", ingredients: ["珍珠", "紅茶", "冰塊"], price: 60, unlockDay: 1 },
+        { name: "珍珠奶茶", ingredients: ["珍珠", "鮮奶", "紅茶", "冰塊"], price: 60, unlockDay: 1 },
+        { name: "紅茶拿鐵", ingredients: ["鮮奶", "紅茶", "冰塊"], price: 75, unlockDay: 1 },
         { name: "蘋果紅萱", ingredients: ["蘋果", "紅茶", "冰塊"], price: 70, unlockDay: 2 },
-        { name: "炸地瓜球", ingredients: ["地瓜球"], price: 50, unlockDay: 3 },
-        { name: "紅茶拿鐵", ingredients: ["鮮奶", "紅茶", "冰塊"], price: 75, unlockDay: 4 },
-        { name: "珍珠鮮奶茶", ingredients: ["珍珠", "鮮奶", "紅茶", "冰塊"], price: 90, unlockDay: 4 }
+        { name: "炸地瓜球", ingredients: ["地瓜球"], price: 50, unlockDay: 3 }
     ];
 
     const CUSTOMER_FACES = ['👨', '👩', '👧', '👦', '👵', '👱‍♀️', '👨‍💼', '👩‍🎓'];
@@ -287,23 +438,38 @@
         tea: { action: '泡紅茶', time: 6, cost: 50, icon: '🍵' },
         boba: { action: '煮珍珠', time: 10, cost: 80, icon: '🧋' },
         ice: { action: '製冰', time: 2, cost: 20, icon: '🧊' },
+        milk: { action: '備鮮奶', time: 3, cost: 90, icon: '🥛' },
         apple: { action: '切蘋果', time: 4, cost: 60, icon: '🍎' },
-        spb: { action: '炸地瓜球', time: 5, cost: 70, icon: '🍠' },
-        milk: { action: '備鮮奶', time: 3, cost: 90, icon: '🥛' }
+        spb: { action: '炸地瓜球', time: 5, cost: 70, icon: '🍠' }
     };
 
     const ING_MAP = {
-        '紅茶': 'tea', '珍珠': 'boba', '冰塊': 'ice',
-        '蘋果': 'apple', '地瓜球': 'spb', '鮮奶': 'milk'
+        '紅茶': 'tea', '珍珠': 'boba', '冰塊': 'ice', '鮮奶': 'milk',
+        '蘋果': 'apple', '地瓜球': 'spb'
     };
 
+    function showTutorial() {
+        document.getElementById('title-content').style.display = 'none';
+        document.getElementById('tutorial-content').style.display = 'block';
+    }
+
+    function initGame() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('game-container').style.display = 'block';
+        
+        updateUnlockUI();
+        startGameTimer();
+    }
+
     function startGameTimer() {
+        // 【修改】將計時器頻率改為 385 毫秒 (約等於 5 分鐘現實時間過完一天)
         gameState.timer = setInterval(() => {
             if(gameState.isEnded) return;
             
             gameState.time += 1; 
             updateClock();
 
+            // 【修改】9:30 開始營業
             if (gameState.time === 9 * 60 + 30) {
                 gameState.isOpen = true;
                 sysMsg("🈺 營業時間到！店門已開，準備迎接客人。");
@@ -317,7 +483,7 @@
             if (gameState.time >= 22 * 60) {
                 endDay();
             }
-        }, 600); 
+        }, 385); 
     }
 
     function updateClock() {
@@ -370,7 +536,6 @@
         }, 1000); 
     }
 
-    // 【修改】客人的點單會根據目前天數過濾，只會點已解鎖的菜單
     function generateCustomer() {
         let availableRecipes = RECIPES.filter(r => r.unlockDay <= gameState.day);
         let randomRecipe = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
@@ -426,7 +591,6 @@
             
             currentCup.push(ingName);
             
-            // 如果只有裝地瓜球，顯示地瓜圖示，否則顯示飲料杯
             if (currentCup.length === 1 && currentCup[0] === '地瓜球') {
                 document.getElementById('cup-visual').innerText = '🍠';
             } else {
@@ -505,7 +669,6 @@
         clearInterval(gameState.timer);
     }
 
-    // 【新增】更新介面解鎖狀態的函式
     function updateUnlockUI() {
         if (gameState.day >= 2) {
             document.getElementById('prep-apple').style.display = 'inline-block';
@@ -517,15 +680,11 @@
             document.getElementById('add-spb').style.display = 'inline-block';
             document.getElementById('inv-spb-wrap').style.display = 'inline';
         }
-        if (gameState.day >= 4) {
-            document.getElementById('prep-milk').style.display = 'inline-block';
-            document.getElementById('add-milk').style.display = 'inline-block';
-            document.getElementById('inv-milk-wrap').style.display = 'inline';
-        }
     }
 
     function nextDay() {
         gameState.day += 1;
+        // 【修改】每天起始時間為 9:00
         gameState.time = 9 * 60;
         gameState.isEnded = false;
         currentOrders = [];
@@ -541,15 +700,12 @@
             }
         });
         
-        // 執行 UI 解鎖
         updateUnlockUI();
         
-        // 根據天數顯示不同的系統廣播
         let unlockMsg = "☀️ 新的一天開始了！早上 9 點，請趕緊備料。";
         if (gameState.day === 2) unlockMsg = "🎉 第 2 天！解鎖新配料【蘋果】，可以製作蘋果紅萱了！";
-        if (gameState.day === 3) unlockMsg = "🎉 第 3 天！解鎖點心【炸地瓜球】！(店長筆記：之後收銀機要加個防呆，有點飲料和地瓜球才能給折扣喔！)";
-        if (gameState.day === 4) unlockMsg = "🎉 第 4 天！解鎖新配料【鮮奶】，新增鮮奶茶系列！";
-        if (gameState.day > 4) unlockMsg = `☀️ 第 ${gameState.day} 天開始！今天也要努力賺錢喔！`;
+        if (gameState.day === 3) unlockMsg = "🎉 第 3 天！解鎖點心【炸地瓜球】！";
+        if (gameState.day > 3) unlockMsg = `☀️ 第 ${gameState.day} 天開始！今天也要努力賺錢喔！`;
 
         document.getElementById('day-display').innerText = gameState.day;
         document.getElementById('overlay').style.display = 'none';
@@ -558,11 +714,6 @@
         updateClock();
         startGameTimer();
     }
-
-    // 初始化第一天的 UI
-    updateUnlockUI();
-    startGameTimer();
-
 </script>
 </body>
 </html>
