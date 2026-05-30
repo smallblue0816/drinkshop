@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手搖職人 Bubble Tea Master - 每日解鎖版</title>
+    <style>
+        :root {
+            --sky: #87CEEB;
+            --floor: #e0bb8b;
+            --counter-top: #8D6E63;
+            --counter-front: #5D4037;
+            --ui-bg: #fffdf7;
+            --accent: #ff7043;
+        }
+        body {
+            font-family: '微軟正黑體', 'Segoe UI', sans-serif;
+            background-color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        #game-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--ui-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .header {
+            background: #4db6ac;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .shop-scene {
+            height: 350px;
+            background: var(--sky);
+            position: relative;
+            border-bottom: 30px solid var(--floor);
+            overflow: hidden;
+        }
+        
+        .counter {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 90px;
+            background: var(--counter-front);
+            border-top: 15px solid var(--counter-top);
+            z-index: 2;
+        }
+        
+        .staff {
+            position: absolute;
+            left: 15%;
+            bottom: 70px;
+            font-size: 90px;
+            z-index: 1;
+            transition: 0.1s;
+        }
+        
+        .making-cup {
+            position: absolute;
+            left: 25%;
+            bottom: 80px;
+            font-size: 40px;
+            z-index: 3;
+        }
+        
+        .customer-queue {
+            position: absolute;
+            right: 5%;
+            bottom: 80px;
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 15px;
+            z-index: 3;
+        }
+        
+        .customer-wrapper {
+            position: relative;
+            animation: walkIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes walkIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .customer { font-size: 80px; }
+        
+        .speech-bubble {
+            position: absolute;
+            top: -40px;
+            right: 20px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 15px;
+            border: 2px solid #333;
+            font-size: 0.9rem;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            z-index: 4;
+        }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 20px;
+            border-width: 10px 10px 0 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+        
+        .controls-area {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            background: var(--ui-bg);
+        }
+        .panel {
+            flex: 1;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #eee;
+        }
+        .panel h3 { margin-top: 0; color: #333; border-bottom: 2px solid var(--accent); padding-bottom: 5px;}
+        
+        .btn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        
+        .prep-btn { width: 130px; text-align: center; }
+
+        button {
+            background-color: white;
+            color: #333;
+            border: 2px solid #ccc;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: 0.1s;
+        }
+        button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+        button:active:not(:disabled) { transform: translateY(0); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; background: #eee; border-color: #aaa; color: #666; }
+        
+        .serve-btn { width: 100%; background-color: #66bb6a; border-color: #388e3c; color: white; margin-top: 10px; font-size: 1.1rem; padding: 12px;}
+        .serve-btn:hover:not(:disabled) { background-color: #4caf50; color: white; }
+        
+        .sys-msg { background: #ffe082; padding: 10px; text-align: center; font-weight: bold; color: #d84315; }
+        
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10;
+            color: white;
+            text-align: center;
+            padding-top: 20vh;
+        }
+
+        #cup-result {
+            margin-top: 5px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+        }
+        
+        /* 隱藏未解鎖的庫存文字 */
+        .inv-wrap { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div class="header">
+        <div>📅 第 <span id="day-display">1</span> 天</div>
+        <div>⏰ 時間: <span id="time-display">09:00</span></div>
+        <div>💰 營業額: $<span id="money-display">500</span></div>
+    </div>
+    
+    <div class="sys-msg" id="sys-message">早安！現在是早上 9 點，材料需要時間準備，請盡快備料！</div>
+
+    <div class="shop-scene">
+        <div class="staff" id="staff-char">🧑‍🍳</div>
+        <div class="making-cup" id="cup-visual"></div>
+        <div class="counter"></div>
+        
+        <div class="customer-queue" id="customer-queue">
+            </div>
+    </div>
+
+    <div class="controls-area">
+        <div class="panel">
+            <h3>🛒 備料區 (需要時間)</h3>
+            <div class="btn-grid">
+                <button class="prep-btn" onclick="prepItem('tea', this)">🍵 泡紅茶 (-$50)</button>
+                <button class="prep-btn" onclick="prepItem('boba', this)">🧋 煮珍珠 (-$80)</button>
+                <button class="prep-btn" onclick="prepItem('ice', this)">🧊 製冰 (-$20)</button>
+                
+                <button class="prep-btn" id="prep-apple" style="display: none;" onclick="prepItem('apple', this)">🍎 切蘋果 (-$60)</button>
+                <button class="prep-btn" id="prep-spb" style="display: none;" onclick="prepItem('spb', this)">🍠 炸地瓜球 (-$70)</button>
+                <button class="prep-btn" id="prep-milk" style="display: none;" onclick="prepItem('milk', this)">🥛 備鮮奶 (-$90)</button>
+            </div>
+            
+            <p style="font-size: 0.9rem; color: #666; margin-top: 15px; line-height: 1.8;">
+                庫存：紅茶(<span id="inv-tea">0</span>) | 珍珠(<span id="inv-boba">0</span>) | 冰塊(<span id="inv-ice">0</span>)
+                <span id="inv-apple-wrap" class="inv-wrap"> | 蘋果(<span id="inv-apple">0</span>)</span>
+                <span id="inv-spb-wrap" class="inv-wrap"> | 地瓜球(<span id="inv-spb">0</span>)</span>
+                <span id="inv-milk-wrap" class="inv-wrap"> | 鮮奶(<span id="inv-milk">0</span>)</span>
+            </p>
+        </div>
+
+        <div class="panel">
+            <h3>🥤 調製區 (一鍵直接加，無分類)</h3>
+            <div class="btn-grid">
+                <button onclick="addIngredient('紅茶')" class="ing-btn" disabled>加紅茶</button>
+                <button onclick="addIngredient('珍珠')" class="ing-btn" disabled>加珍珠</button>
+                <button onclick="addIngredient('冰塊')" class="ing-btn" disabled>加冰塊</button>
+                
+                <button onclick="addIngredient('蘋果')" class="ing-btn" id="add-apple" style="display: none;" disabled>加蘋果</button>
+                <button onclick="addIngredient('地瓜球')" class="ing-btn" id="add-spb" style="display: none;" disabled>裝地瓜球</button>
+                <button onclick="addIngredient('鮮奶')" class="ing-btn" id="add-milk" style="display: none;" disabled>加鮮奶</button>
+            </div>
+            <div style="margin-top: 10px; font-weight: bold; color: #555;">
+                目前加入: <span id="cup-preview">空</span>
+            </div>
+            <div id="cup-result"></div>
+
+            <button onclick="clearCup()" style="width: 100%; margin-top: 5px;">🗑️ 倒掉重做</button>
+            <button onclick="serveDrink()" id="btn-serve" class="serve-btn" disabled>✨ 完成出餐 ✨</button>
+        </div>
+    </div>
+</div>
+
+<div id="overlay">
+    <h1 style="font-size: 3rem; margin-bottom: 10px;">🌙 今日營業結束</h1>
+    <p style="font-size: 1.5rem; margin-bottom: 30px;">辛苦了！趕緊休息，明天繼續拼營業額。</p>
+    <button onclick="nextDay()" style="font-size: 1.5rem; padding: 15px 30px; background: var(--accent); color: white; border: none; border-radius: 10px; cursor: pointer;">進入下一天 ➔</button>
+</div>
+
+<script>
+    let gameState = {
+        day: 1,
+        time: 9 * 60, 
+        money: 500,
+        inventory: { tea: 0, boba: 0, ice: 0, apple: 0, spb: 0, milk: 0 },
+        isOpen: false,
+        isEnded: false,
+        timer: null
+    };
+
+    let currentCup = [];
+    let currentOrders = [];
+    
+    // 【修改】為每個配方加上了 unlockDay (解鎖天數)
+    const RECIPES = [
+        { name: "純粹紅茶", ingredients: ["紅茶", "冰塊"], price: 35, unlockDay: 1 },
+        { name: "珍珠奶茶", ingredients: ["珍珠", "紅茶", "冰塊"], price: 60, unlockDay: 1 },
+        { name: "蘋果紅萱", ingredients: ["蘋果", "紅茶", "冰塊"], price: 70, unlockDay: 2 },
+        { name: "炸地瓜球", ingredients: ["地瓜球"], price: 50, unlockDay: 3 },
+        { name: "紅茶拿鐵", ingredients: ["鮮奶", "紅茶", "冰塊"], price: 75, unlockDay: 4 },
+        { name: "珍珠鮮奶茶", ingredients: ["珍珠", "鮮奶", "紅茶", "冰塊"], price: 90, unlockDay: 4 }
+    ];
+
+    const CUSTOMER_FACES = ['👨', '👩', '👧', '👦', '👵', '👱‍♀️', '👨‍💼', '👩‍🎓'];
+
+    const PREP_CONFIG = {
+        tea: { action: '泡紅茶', time: 6, cost: 50, icon: '🍵' },
+        boba: { action: '煮珍珠', time: 10, cost: 80, icon: '🧋' },
+        ice: { action: '製冰', time: 2, cost: 20, icon: '🧊' },
+        apple: { action: '切蘋果', time: 4, cost: 60, icon: '🍎' },
+        spb: { action: '炸地瓜球', time: 5, cost: 70, icon: '🍠' },
+        milk: { action: '備鮮奶', time: 3, cost: 90, icon: '🥛' }
+    };
+
+    const ING_MAP = {
+        '紅茶': 'tea', '珍珠': 'boba', '冰塊': 'ice',
+        '蘋果': 'apple', '地瓜球': 'spb', '鮮奶': 'milk'
+    };
+
+    function startGameTimer() {
+        gameState.timer = setInterval(() => {
+            if(gameState.isEnded) return;
+            
+            gameState.time += 1; 
+            updateClock();
+
+            if (gameState.time === 9 * 60 + 30) {
+                gameState.isOpen = true;
+                sysMsg("🈺 營業時間到！店門已開，準備迎接客人。");
+                enableMakeArea(true);
+            }
+
+            if (gameState.isOpen && Math.random() < 0.15 && currentOrders.length < 5) {
+                generateCustomer();
+            }
+
+            if (gameState.time >= 22 * 60) {
+                endDay();
+            }
+        }, 600); 
+    }
+
+    function updateClock() {
+        let h = Math.floor(gameState.time / 60).toString().padStart(2, '0');
+        let m = (gameState.time % 60).toString().padStart(2, '0');
+        document.getElementById('time-display').innerText = `${h}:${m}`;
+    }
+
+    function updateMoney(amount) {
+        gameState.money += amount;
+        document.getElementById('money-display').innerText = gameState.money;
+    }
+
+    function sysMsg(msg) {
+        document.getElementById('sys-message').innerText = msg;
+    }
+
+    function prepItem(itemKey, btnElement) {
+        let config = PREP_CONFIG[itemKey];
+
+        if (gameState.money < config.cost) {
+            sysMsg("❌ 錢不夠了，無法備料！");
+            return;
+        }
+
+        updateMoney(-config.cost);
+        sysMsg(`⏳ 開始${config.action}... 需要 ${config.time} 秒`);
+        
+        btnElement.disabled = true;
+        let timeLeft = config.time;
+        btnElement.innerText = `⏳ 準備中(${timeLeft}s)`;
+
+        let countdownTimer = setInterval(() => {
+            timeLeft -= 1;
+            
+            if (timeLeft > 0) {
+                btnElement.innerText = `⏳ 準備中(${timeLeft}s)`;
+            } else {
+                clearInterval(countdownTimer);
+                
+                gameState.inventory[itemKey] += 10;
+                document.getElementById(`inv-${itemKey}`).innerText = gameState.inventory[itemKey];
+                
+                btnElement.disabled = false;
+                btnElement.innerText = `${config.icon} ${config.action} (-$${config.cost})`;
+                
+                sysMsg(`✅ ${config.action} 完成！庫存 +10`);
+                staffBounce(); 
+            }
+        }, 1000); 
+    }
+
+    // 【修改】客人的點單會根據目前天數過濾，只會點已解鎖的菜單
+    function generateCustomer() {
+        let availableRecipes = RECIPES.filter(r => r.unlockDay <= gameState.day);
+        let randomRecipe = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
+        let face = CUSTOMER_FACES[Math.floor(Math.random() * CUSTOMER_FACES.length)];
+        let orderId = Date.now();
+        
+        currentOrders.push({ id: orderId, name: randomRecipe.name, price: randomRecipe.price, face: face });
+        renderCustomers();
+    }
+
+    function renderCustomers() {
+        const queue = document.getElementById('customer-queue');
+        queue.innerHTML = ''; 
+        
+        currentOrders.forEach((order, index) => {
+            let wrapper = document.createElement('div');
+            wrapper.className = 'customer-wrapper';
+            
+            if (index !== currentOrders.length - 1) {
+                wrapper.style.animation = 'none';
+                wrapper.style.transform = 'translateX(0)';
+                wrapper.style.opacity = '1';
+            }
+            
+            let speechHTML = index === 0 ? `<div class="speech-bubble">我要<br>${order.name}！</div>` : '';
+            
+            wrapper.innerHTML = `
+                ${speechHTML}
+                <div class="customer">${order.face}</div>
+            `;
+            queue.appendChild(wrapper);
+        });
+    }
+
+    function enableMakeArea(enable) {
+        let btns = document.querySelectorAll('.ing-btn');
+        btns.forEach(btn => btn.disabled = !enable);
+        document.getElementById('btn-serve').disabled = !enable;
+    }
+
+    function staffBounce() {
+        const staff = document.getElementById('staff-char');
+        staff.style.transform = 'translateY(-20px)';
+        setTimeout(() => { staff.style.transform = 'translateY(0)'; }, 150);
+    }
+
+    function addIngredient(ingName) {
+        let key = ING_MAP[ingName]; 
+        
+        if (gameState.inventory[key] > 0) {
+            gameState.inventory[key] -= 1;
+            document.getElementById(`inv-${key}`).innerText = gameState.inventory[key];
+            
+            currentCup.push(ingName);
+            
+            // 如果只有裝地瓜球，顯示地瓜圖示，否則顯示飲料杯
+            if (currentCup.length === 1 && currentCup[0] === '地瓜球') {
+                document.getElementById('cup-visual').innerText = '🍠';
+            } else {
+                document.getElementById('cup-visual').innerText = '🥤';
+            }
+            
+            staffBounce();
+            updateCupStatus();
+        } else {
+            sysMsg(`❌ 【${ingName}】庫存不足啦！趕快去備料！`);
+        }
+    }
+
+    function clearCup() {
+        currentCup = [];
+        document.getElementById('cup-visual').innerText = '';
+        staffBounce();
+        updateCupStatus(); 
+    }
+
+    function updateCupStatus() {
+        let previewText = currentCup.length > 0 ? currentCup.join(' + ') : '空';
+        document.getElementById('cup-preview').innerText = previewText;
+
+        let resultDiv = document.getElementById('cup-result');
+        if (currentCup.length === 0) {
+            resultDiv.innerText = '';
+            return;
+        }
+
+        let matchedRecipe = RECIPES.find(r => checkRecipe(currentCup, r.ingredients));
+        
+        if (matchedRecipe) {
+            resultDiv.innerText = `👉 預計完成：【${matchedRecipe.name}】`;
+            resultDiv.style.color = '#4caf50';
+        } else {
+            resultDiv.innerText = `👉 預計完成：未知飲料 (配方未完成或錯誤)`;
+            resultDiv.style.color = '#f44336';
+        }
+    }
+
+    function serveDrink() {
+        if (currentOrders.length === 0) {
+            sysMsg("👀 目前沒有客人在等喔！");
+            return;
+        }
+
+        let targetOrder = currentOrders[0]; 
+        let targetRecipe = RECIPES.find(r => r.name === targetOrder.name);
+        let isCorrect = checkRecipe(currentCup, targetRecipe.ingredients);
+
+        if (isCorrect) {
+            sysMsg(`🎉 成功賣出 ${targetOrder.name}！賺了 $${targetOrder.price}`);
+            updateMoney(targetOrder.price);
+        } else {
+            sysMsg("💢 做錯了啦！客人氣呼呼地走掉了...");
+        }
+        
+        currentOrders.shift(); 
+        renderCustomers();
+        clearCup(); 
+    }
+
+    function checkRecipe(cup, recipeList) {
+        if (cup.length !== recipeList.length) return false;
+        let cupSorted = [...cup].sort();
+        let recipeSorted = [...recipeList].sort();
+        return cupSorted.every((val, index) => val === recipeSorted[index]);
+    }
+
+    function endDay() {
+        gameState.isEnded = true;
+        gameState.isOpen = false;
+        enableMakeArea(false);
+        document.getElementById('overlay').style.display = 'block';
+        clearInterval(gameState.timer);
+    }
+
+    // 【新增】更新介面解鎖狀態的函式
+    function updateUnlockUI() {
+        if (gameState.day >= 2) {
+            document.getElementById('prep-apple').style.display = 'inline-block';
+            document.getElementById('add-apple').style.display = 'inline-block';
+            document.getElementById('inv-apple-wrap').style.display = 'inline';
+        }
+        if (gameState.day >= 3) {
+            document.getElementById('prep-spb').style.display = 'inline-block';
+            document.getElementById('add-spb').style.display = 'inline-block';
+            document.getElementById('inv-spb-wrap').style.display = 'inline';
+        }
+        if (gameState.day >= 4) {
+            document.getElementById('prep-milk').style.display = 'inline-block';
+            document.getElementById('add-milk').style.display = 'inline-block';
+            document.getElementById('inv-milk-wrap').style.display = 'inline';
+        }
+    }
+
+    function nextDay() {
+        gameState.day += 1;
+        gameState.time = 9 * 60;
+        gameState.isEnded = false;
+        currentOrders = [];
+        clearCup();
+        renderCustomers();
+        
+        let prepBtns = document.querySelectorAll('.prep-btn');
+        Object.keys(PREP_CONFIG).forEach((key, index) => {
+            let config = PREP_CONFIG[key];
+            if(prepBtns[index]) {
+                prepBtns[index].disabled = false;
+                prepBtns[index].innerText = `${config.icon} ${config.action} (-$${config.cost})`;
+            }
+        });
+        
+        // 執行 UI 解鎖
+        updateUnlockUI();
+        
+        // 根據天數顯示不同的系統廣播
+        let unlockMsg = "☀️ 新的一天開始了！早上 9 點，請趕緊備料。";
+        if (gameState.day === 2) unlockMsg = "🎉 第 2 天！解鎖新配料【蘋果】，可以製作蘋果紅萱了！";
+        if (gameState.day === 3) unlockMsg = "🎉 第 3 天！解鎖點心【炸地瓜球】！(店長筆記：之後收銀機要加個防呆，有點飲料和地瓜球才能給折扣喔！)";
+        if (gameState.day === 4) unlockMsg = "🎉 第 4 天！解鎖新配料【鮮奶】，新增鮮奶茶系列！";
+        if (gameState.day > 4) unlockMsg = `☀️ 第 ${gameState.day} 天開始！今天也要努力賺錢喔！`;
+
+        document.getElementById('day-display').innerText = gameState.day;
+        document.getElementById('overlay').style.display = 'none';
+        sysMsg(unlockMsg);
+        
+        updateClock();
+        startGameTimer();
+    }
+
+    // 初始化第一天的 UI
+    updateUnlockUI();
+    startGameTimer();
+
+</script>
+</body>
+</html>
