@@ -13,7 +13,7 @@
             --ui-bg: #2a2a2a;
             --accent: #ff7043;
         }
-        /* 1. 終極鎖定螢幕範圍，防止瀏覽器 UI 吃掉空間 */
+        
         html, body {
             position: fixed;
             top: 0; bottom: 0; left: 0; right: 0;
@@ -22,10 +22,9 @@
             background-color: #121212;
             overflow: hidden; 
             font-family: '微軟正黑體', 'Segoe UI', sans-serif;
-            touch-action: none; /* 防止滑動與下拉重新整理 */
+            touch-action: none; 
         }
         
-        /* 強制橫屏提示蓋板 */
         #portrait-warning {
             display: none;
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -41,7 +40,6 @@
             #start-screen, #game-container, #overlay { display: none !important; }
         }
 
-        /* 遊戲滿版主體 */
         #game-container {
             display: none; 
             width: 100%; height: 100%;
@@ -50,7 +48,6 @@
             flex-direction: column;
         }
         
-        /* 頂部資訊列 */
         .header { 
             background: #004d40; color: white; padding: 0 2vw; 
             display: flex; justify-content: space-between; align-items: center;
@@ -64,7 +61,6 @@
             flex: 0 0 5%;
         }
         
-        /* 視覺區 (佔據上半部剩餘空間) */
         .shop-scene { 
             flex: 1; 
             background: var(--sky); position: relative; 
@@ -97,50 +93,48 @@
             100% { width: 0%; background-color: #f44336; }
         }
 
-        /* 2. 操作面板區 (嚴格鎖死高度比例，避免被擠出畫面) */
         .controls-area { 
-            flex: 0 0 45%; height: 45%; /* 鎖定在畫面下半部 45% */
+            flex: 0 0 45%; height: 45%;
             display: flex; padding: 1%; gap: 1%; background: #222; box-sizing: border-box; 
         }
         .panel { 
             flex: 1; background: #333; padding: 1%; border-radius: 8px; border: 1px solid #555; 
-            display: flex; flex-direction: column; color: white; overflow: hidden; /* 防止內容撐開 */
+            display: flex; flex-direction: column; color: white; overflow: hidden; 
         }
         .panel h3 { margin: 0 0 1% 0; color: #ffccbc; border-bottom: 2px solid var(--accent); padding-bottom: 2px; font-size: clamp(0.8rem, 2.5vh, 1rem); flex: 0 0 auto;}
         
-        /* 九宮格按鈕區 */
         .btn-grid { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            grid-template-rows: repeat(2, 1fr); /* 強制兩排 */
+            grid-template-rows: repeat(2, 1fr);
             gap: 4px; 
             flex: 1; 
-            min-height: 0; /* 讓 Grid 可以縮小，這是排版不破圖的關鍵 */
+            min-height: 0; 
         }
 
-        button { 
+        /* 【修復關鍵】：僅針對遊戲控制區內的按鈕設定滿版，不影響外層介面按鈕 */
+        .controls-area button { 
             background-color: #555; color: white; border: 1px solid #777; border-radius: 6px; 
             cursor: pointer; font-weight: bold; transition: 0.1s; 
             font-size: clamp(0.7rem, 2.2vh, 1.2rem); 
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             padding: 0; margin: 0; width: 100%; height: 100%;
         }
-        button:active:not(:disabled) { transform: scale(0.95); border-color: var(--accent); background-color: #666; }
-        button:disabled { opacity: 0.4; cursor: not-allowed; background: #444; border-color: #333; color: #888; }
+        .controls-area button:active:not(:disabled) { transform: scale(0.95); border-color: var(--accent); background-color: #666; }
+        .controls-area button:disabled { opacity: 0.4; cursor: not-allowed; background: #444; border-color: #333; color: #888; }
         
         .inv-text { font-size: clamp(0.6rem, 2vh, 0.9rem); color: #aaa; margin-top: 1%; text-align: center; flex: 0 0 auto;}
         .cup-status { margin: 1% 0; font-weight: bold; color: #ccc; font-size: clamp(0.7rem, 2vh, 1rem); flex: 0 0 auto;}
         #cup-result { color: #4caf50; }
 
-        /* 底部出餐動作列 */
         .action-row { display: flex; gap: 4px; flex: 0 0 25%; margin-top: auto;}
-        .serve-btn { flex: 2; background-color: #2e7d32; border-color: #1b5e20; font-size: clamp(0.9rem, 2.5vh, 1.5rem);}
-        .serve-btn:active:not(:disabled) { background-color: #388e3c; }
-        .trash-btn { flex: 1; background-color: #c62828; border-color: #b71c1c; font-size: clamp(0.8rem, 2vh, 1rem);}
+        .action-row button { height: 100%; }
+        .serve-btn { flex: 2; background-color: #2e7d32 !important; border-color: #1b5e20 !important; font-size: clamp(0.9rem, 2.5vh, 1.5rem) !important;}
+        .serve-btn:active:not(:disabled) { background-color: #388e3c !important; }
+        .trash-btn { flex: 1; background-color: #c62828 !important; border-color: #b71c1c !important; font-size: clamp(0.8rem, 2vh, 1rem) !important;}
         
         .inv-wrap { display: none; }
 
-        /* 開始與結算蓋板 */
         #start-screen, #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(10, 10, 10, 0.95); z-index: 100; color: white; text-align: center;
@@ -153,7 +147,9 @@
             width: 85vw; max-width: 600px; max-height: 90vh; overflow-y: auto;
             border: 2px solid var(--accent); box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
-        #title-content { border: none; background: transparent; box-shadow: none; }
+        
+        /* 【修復關鍵】：徹底隱藏標題畫面的滾動條 */
+        #title-content { border: none; background: transparent; box-shadow: none; overflow: hidden; }
         #title-content h1 { font-size: clamp(2rem, 8vh, 4rem); margin-bottom: 1vh; text-shadow: 2px 4px 10px rgba(0,0,0,0.8); }
         .subtitle { font-size: clamp(1rem, 3vh, 1.5rem); color: #ccc; margin-bottom: 5vh; }
         
@@ -161,7 +157,12 @@
         .recipe-table th, .recipe-table td { padding: 1vh; border: 1px solid #ccc; text-align: left; }
         .recipe-table th { background: var(--accent); color: white; text-align: center; }
         
-        .start-btn, .end-btn { display: block; width: 100%; background: var(--accent); color: white; font-size: clamp(1rem, 3vh, 1.5rem); padding: 2vh; border: none; border-radius: 10px; font-weight: bold; margin-top: 1vh;}
+        .start-btn, .end-btn { 
+            display: block; box-sizing: border-box; width: 100%; background: var(--accent); color: white; 
+            font-size: clamp(1rem, 3vh, 1.5rem); padding: 2vh; border: none; border-radius: 10px; 
+            font-weight: bold; margin-top: 1vh; cursor: pointer; transition: 0.1s;
+        }
+        .start-btn:active, .end-btn:active { transform: scale(0.95); }
         .pulse-btn { width: 60%; margin: 0 auto; border-radius: 50px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 112, 67, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0); } }
         
@@ -181,19 +182,19 @@
 
 <div id="start-screen">
     <div class="start-content" id="title-content">
-        <h1>🥤 手搖職人<br>Bubble Tea Master</h1>
+        <h1>🥤 手搖一搖<br>Bubble Tea Master</h1>
         <div class="subtitle">地獄廚房等級！挑戰你的極限手速！</div>
         <button class="start-btn pulse-btn" onclick="showTutorial()">開始挑戰</button>
     </div>
 
     <div class="start-content" id="tutorial-content" style="display: none;">
-        <h1 style="color:var(--accent); margin-top:0;">📖 地獄店長指南</h1>
+        <h1 style="color:var(--accent); margin-top:0;">📖 店長指南</h1>
         <h3>🎯 遊戲目的</h3>
-        <p style="font-size: clamp(0.8rem, 2vh, 1rem);">一天只有 <b>3 分鐘</b>！瘋狂出餐以達到每日目標。</p>
-        <h3>🕹️ 殘酷機制</h3>
-        <ul style="font-size: clamp(0.8rem, 2vh, 1rem); padding-left: 20px;">
-            <li><strong>奧客倒數：</strong> 客人只有 <b>25 秒</b> 耐心，注意腳下進度條！</li>
-            <li><strong>同步備料：</strong> 雙手並用，同時按下多個備料按鈕提升效率！</li>
+        <p style="font-size: clamp(0.8rem, 2vh, 1rem);">開始你的一天，瘋狂出餐以達到每日目標。</p>
+     <h3>🕹️ 操作方式</h3>
+        <ul>
+            <li><strong>早上 9:00 備料：</strong> 點擊「備料區」補充庫存，請同時多點幾個一起準備！</li>
+            <li><strong>早上 9:30 營業：</strong> 依照客人對話框點單，加對配料點擊「完成出餐」。</li>
         </ul>
         <table class="recipe-table">
             <tr><th>解鎖</th><th>品項</th><th>配料</th></tr>
