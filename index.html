@@ -3,38 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>手搖職人 Bubble Tea Master - 手機完美縮放版</title>
+    <title>手搖職人 Bubble Tea Master - 手機終極鎖死版</title>
     <style>
         :root {
-            --sky: #1b3a4b; /* 微調為深色系視覺，減少刺眼感 */
+            --sky: #1b3a4b; 
             --floor: #5c4033;
             --counter-top: #8D6E63;
             --counter-front: #3e2723;
             --ui-bg: #2a2a2a;
             --accent: #ff7043;
         }
-        body {
-            font-family: '微軟正黑體', 'Segoe UI', sans-serif;
+        /* 1. 終極鎖定螢幕範圍，防止瀏覽器 UI 吃掉空間 */
+        html, body {
+            position: fixed;
+            top: 0; bottom: 0; left: 0; right: 0;
+            width: 100%; height: 100%;
+            margin: 0; padding: 0;
             background-color: #121212;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            width: 100vw;
             overflow: hidden; 
+            font-family: '微軟正黑體', 'Segoe UI', sans-serif;
+            touch-action: none; /* 防止滑動與下拉重新整理 */
         }
         
         /* 強制橫屏提示蓋板 */
         #portrait-warning {
             display: none;
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: #111; color: white; z-index: 9999;
             flex-direction: column; justify-content: center; align-items: center;
             text-align: center;
         }
-        #portrait-warning div { font-size: 15vw; animation: rotatePhone 1.5s infinite; margin-bottom: 20px;}
+        #portrait-warning div { font-size: 15vh; animation: rotatePhone 1.5s infinite; margin-bottom: 20px;}
         @keyframes rotatePhone { 0% { transform: rotate(0deg); } 100% { transform: rotate(90deg); } }
         
         @media screen and (orientation: portrait) {
@@ -45,25 +44,24 @@
         /* 遊戲滿版主體 */
         #game-container {
             display: none; 
-            width: 100vw; 
-            height: 100vh;
-            max-width: 100%;
+            width: 100%; height: 100%;
             background: var(--ui-bg); 
             display: flex; 
             flex-direction: column;
         }
         
-        /* 頂部資訊列 (高度固定比例) */
+        /* 頂部資訊列 */
         .header { 
-            background: #004d40; color: white; padding: 1vh 2vw; 
+            background: #004d40; color: white; padding: 0 2vw; 
             display: flex; justify-content: space-between; align-items: center;
             font-size: clamp(0.9rem, 2.5vh, 1.2rem); font-weight: bold; z-index: 10;
-            height: 5vh; box-sizing: border-box;
+            height: 6%; box-sizing: border-box; flex: 0 0 6%;
         }
         .sys-msg { 
-            background: #b71c1c; padding: 0.5vh; text-align: center; 
+            background: #b71c1c; padding: 0 2vw; text-align: center; 
             font-weight: bold; color: white; font-size: clamp(0.8rem, 2vh, 1rem); 
-            z-index: 10; height: 4vh; box-sizing: border-box; display: flex; justify-content: center; align-items: center;
+            z-index: 10; height: 5%; box-sizing: border-box; display: flex; justify-content: center; align-items: center;
+            flex: 0 0 5%;
         }
         
         /* 視覺區 (佔據上半部剩餘空間) */
@@ -72,24 +70,23 @@
             background: var(--sky); position: relative; 
             border-bottom: 3vh solid var(--floor); overflow: hidden; 
         }
-        .counter { position: absolute; bottom: 0; left: 0; width: 100%; height: 12vh; background: var(--counter-front); border-top: 2vh solid var(--counter-top); z-index: 2; }
+        .counter { position: absolute; bottom: 0; left: 0; width: 100%; height: 10vh; background: var(--counter-front); border-top: 1.5vh solid var(--counter-top); z-index: 2; }
         
-        /* 小人與物件使用 vh 作為單位，確保不被裁切 */
-        .staff { position: absolute; left: 15%; bottom: 8vh; font-size: 18vh; z-index: 1; transition: 0.1s; }
-        .making-cup { position: absolute; left: 24%; bottom: 12vh; font-size: 8vh; z-index: 3; }
-        .customer-queue { position: absolute; right: 2%; bottom: 8vh; display: flex; flex-direction: row-reverse; gap: 2vw; z-index: 3; }
+        .staff { position: absolute; left: 15%; bottom: 6vh; font-size: 15vh; z-index: 1; transition: 0.1s; }
+        .making-cup { position: absolute; left: 24%; bottom: 9vh; font-size: 6vh; z-index: 3; }
+        .customer-queue { position: absolute; right: 2%; bottom: 6vh; display: flex; flex-direction: row-reverse; gap: 2vw; z-index: 3; }
         .customer-wrapper { position: relative; animation: walkIn 0.3s ease-out forwards; }
         @keyframes walkIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .customer { font-size: 18vh; }
+        .customer { font-size: 15vh; }
         
         .speech-bubble {
-            position: absolute; top: -5vh; right: 0px; background: white; padding: 0.5vh 1vw; border-radius: 8px;
+            position: absolute; top: -4vh; right: 0px; background: white; padding: 0.5vh 1vw; border-radius: 8px;
             border: 2px solid #333; font-size: clamp(0.6rem, 2vh, 1rem); font-weight: bold; white-space: nowrap; box-shadow: 1px 1px 0px rgba(0,0,0,0.2); z-index: 4; color: black;
         }
         .speech-bubble::after { content: ''; position: absolute; bottom: -1vh; right: 2vw; border-width: 1vh 1vh 0 0; border-style: solid; border-color: white transparent transparent transparent; }
         
         .patience-bar {
-            position: absolute; bottom: -1vh; left: 0; height: 1.5vh; width: 100%;
+            position: absolute; bottom: -1vh; left: 0; height: 1vh; width: 100%;
             border-radius: 1vh; border: 1px solid #333;
             animation-name: drainPatience; animation-timing-function: linear; animation-fill-mode: forwards;
         }
@@ -100,24 +97,25 @@
             100% { width: 0%; background-color: #f44336; }
         }
 
-        /* 操作面板區 (強制佔據下半部固定比例) */
+        /* 2. 操作面板區 (嚴格鎖死高度比例，避免被擠出畫面) */
         .controls-area { 
-            height: 48vh; /* 給予按鈕區充足的空間 */
-            display: flex; padding: 1vh 1vw; gap: 1vw; background: #222; box-sizing: border-box; 
+            flex: 0 0 45%; height: 45%; /* 鎖定在畫面下半部 45% */
+            display: flex; padding: 1%; gap: 1%; background: #222; box-sizing: border-box; 
         }
         .panel { 
-            flex: 1; background: #333; padding: 1vh; border-radius: 8px; border: 1px solid #555; 
-            display: flex; flex-direction: column; color: white;
+            flex: 1; background: #333; padding: 1%; border-radius: 8px; border: 1px solid #555; 
+            display: flex; flex-direction: column; color: white; overflow: hidden; /* 防止內容撐開 */
         }
-        .panel h3 { margin: 0 0 1vh 0; color: #ffccbc; border-bottom: 2px solid var(--accent); padding-bottom: 0.5vh; font-size: clamp(0.9rem, 2.5vh, 1.1rem);}
+        .panel h3 { margin: 0 0 1% 0; color: #ffccbc; border-bottom: 2px solid var(--accent); padding-bottom: 2px; font-size: clamp(0.8rem, 2.5vh, 1rem); flex: 0 0 auto;}
         
-        /* 使用 CSS Grid 完美切割按鈕空間 */
+        /* 九宮格按鈕區 */
         .btn-grid { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            grid-auto-rows: 1fr; /* 讓所有按鈕等高 */
-            gap: 0.8vh 0.8vw; 
-            flex: 1; /* 填滿剩餘高度 */
+            grid-template-rows: repeat(2, 1fr); /* 強制兩排 */
+            gap: 4px; 
+            flex: 1; 
+            min-height: 0; /* 讓 Grid 可以縮小，這是排版不破圖的關鍵 */
         }
 
         button { 
@@ -125,25 +123,26 @@
             cursor: pointer; font-weight: bold; transition: 0.1s; 
             font-size: clamp(0.7rem, 2.2vh, 1.2rem); 
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 0; margin: 0;
+            padding: 0; margin: 0; width: 100%; height: 100%;
         }
         button:active:not(:disabled) { transform: scale(0.95); border-color: var(--accent); background-color: #666; }
         button:disabled { opacity: 0.4; cursor: not-allowed; background: #444; border-color: #333; color: #888; }
         
-        .inv-text { font-size: clamp(0.6rem, 1.8vh, 0.9rem); color: #aaa; margin-top: 1vh; text-align: center;}
-        .cup-status { margin: 1vh 0; font-weight: bold; color: #ccc; font-size: clamp(0.7rem, 2vh, 1rem); }
-        #cup-result { color: #4caf50; min-height: 3vh; }
+        .inv-text { font-size: clamp(0.6rem, 2vh, 0.9rem); color: #aaa; margin-top: 1%; text-align: center; flex: 0 0 auto;}
+        .cup-status { margin: 1% 0; font-weight: bold; color: #ccc; font-size: clamp(0.7rem, 2vh, 1rem); flex: 0 0 auto;}
+        #cup-result { color: #4caf50; }
 
-        .action-row { display: flex; gap: 1vw; height: 8vh; margin-top: auto;}
-        .serve-btn { flex: 2; background-color: #2e7d32; border-color: #1b5e20; font-size: clamp(1rem, 3vh, 1.5rem);}
+        /* 底部出餐動作列 */
+        .action-row { display: flex; gap: 4px; flex: 0 0 25%; margin-top: auto;}
+        .serve-btn { flex: 2; background-color: #2e7d32; border-color: #1b5e20; font-size: clamp(0.9rem, 2.5vh, 1.5rem);}
         .serve-btn:active:not(:disabled) { background-color: #388e3c; }
-        .trash-btn { flex: 1; background-color: #c62828; border-color: #b71c1c; }
+        .trash-btn { flex: 1; background-color: #c62828; border-color: #b71c1c; font-size: clamp(0.8rem, 2vh, 1rem);}
         
         .inv-wrap { display: none; }
 
         /* 開始與結算蓋板 */
         #start-screen, #overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(10, 10, 10, 0.95); z-index: 100; color: white; text-align: center;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
@@ -177,7 +176,7 @@
 
 <div id="portrait-warning">
     <div>📱</div>
-    <h2>請將手機轉為橫向遊玩</h2>
+    <h2>請旋轉手機<br>橫向遊玩體驗更佳</h2>
 </div>
 
 <div id="start-screen">
@@ -190,11 +189,11 @@
     <div class="start-content" id="tutorial-content" style="display: none;">
         <h1 style="color:var(--accent); margin-top:0;">📖 地獄店長指南</h1>
         <h3>🎯 遊戲目的</h3>
-        <p style="font-size: clamp(0.8rem, 2vh, 1rem);">一天只有 <b>3 分鐘</b>！你必須瘋狂出餐達到每日目標（如 $3000）。</p>
+        <p style="font-size: clamp(0.8rem, 2vh, 1rem);">一天只有 <b>3 分鐘</b>！瘋狂出餐以達到每日目標。</p>
         <h3>🕹️ 殘酷機制</h3>
         <ul style="font-size: clamp(0.8rem, 2vh, 1rem); padding-left: 20px;">
-            <li><strong>等太久會跑掉：</strong> 客人只有 <b>25 秒</b> 耐心，注意腳下進度條！</li>
-            <li><strong>提早備料：</strong> 隨時注意客人頭上點單，善用多指同時點擊備料！</li>
+            <li><strong>奧客倒數：</strong> 客人只有 <b>25 秒</b> 耐心，注意腳下進度條！</li>
+            <li><strong>同步備料：</strong> 雙手並用，同時按下多個備料按鈕提升效率！</li>
         </ul>
         <table class="recipe-table">
             <tr><th>解鎖</th><th>品項</th><th>配料</th></tr>
@@ -214,7 +213,7 @@
         <div style="color: #ffca28;">🎯 目標: $<span id="goal-display">1500</span></div> 
     </div>
     
-    <div class="sys-msg" id="sys-message">早上 9 點！只有幾秒鐘可以備料，快按！</div>
+    <div class="sys-msg" id="sys-message" style="background: #ef5350; color: white;">早上 9 點！只有幾秒鐘可以備料，快按！</div>
 
     <div class="shop-scene">
         <div class="staff" id="staff-char">🧑‍🍳</div>
@@ -253,7 +252,7 @@
             </div>
             <div class="cup-status">
                 杯中: <span id="cup-preview">空</span>
-                <div id="cup-result"></div>
+                <span id="cup-result"></span>
             </div>
             <div class="action-row">
                 <button onclick="clearCup()" class="trash-btn">🗑️ 倒掉</button>
@@ -496,9 +495,9 @@
 
         let matchedRecipe = RECIPES.find(r => checkRecipe(currentCup, r.ingredients));
         if (matchedRecipe) {
-            resultDiv.innerText = `👉完成: ${matchedRecipe.name}`; resultDiv.style.color = '#4caf50';
+            resultDiv.innerText = ` 👉 ${matchedRecipe.name}`; resultDiv.style.color = '#4caf50';
         } else {
-            resultDiv.innerText = `👉未知 (錯誤配方)`; resultDiv.style.color = '#f44336';
+            resultDiv.innerText = ` 👉 未知`; resultDiv.style.color = '#f44336';
         }
     }
 
@@ -562,7 +561,7 @@
             nextBtn.style.display = "block";
             retryBtn.style.display = "none";
         } else {
-            goalStatus.innerText = `❌ 未達標... (還差 $${goals.star1 - dailyStats.earned})`;
+            goalStatus.innerText = `❌ 未達標... (差 $${goals.star1 - dailyStats.earned})`;
             goalStatus.style.color = "#ef5350";
             nextBtn.style.display = "none";
             retryBtn.style.display = "block"; 
