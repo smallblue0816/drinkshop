@@ -3,37 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>手搖職人 Bubble Tea Master - 地獄手速版</title>
+    <title>手搖職人 Bubble Tea Master - 手機完美縮放版</title>
     <style>
         :root {
-            --sky: #87CEEB;
-            --floor: #e0bb8b;
+            --sky: #1b3a4b; /* 微調為深色系視覺，減少刺眼感 */
+            --floor: #5c4033;
             --counter-top: #8D6E63;
-            --counter-front: #5D4037;
-            --ui-bg: #fffdf7;
+            --counter-front: #3e2723;
+            --ui-bg: #2a2a2a;
             --accent: #ff7043;
         }
         body {
             font-family: '微軟正黑體', 'Segoe UI', sans-serif;
-            background-color: #222;
+            background-color: #121212;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             height: 100vh;
+            width: 100vw;
             overflow: hidden; 
         }
         
         /* 強制橫屏提示蓋板 */
         #portrait-warning {
             display: none;
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #222; color: white; z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #111; color: white; z-index: 9999;
             flex-direction: column; justify-content: center; align-items: center;
             text-align: center;
         }
-        #portrait-warning div { font-size: 4rem; animation: rotatePhone 1.5s infinite; }
+        #portrait-warning div { font-size: 15vw; animation: rotatePhone 1.5s infinite; margin-bottom: 20px;}
         @keyframes rotatePhone { 0% { transform: rotate(0deg); } 100% { transform: rotate(90deg); } }
         
         @media screen and (orientation: portrait) {
@@ -41,67 +42,56 @@
             #start-screen, #game-container, #overlay { display: none !important; }
         }
 
-        /* 開始與教學畫面 */
-        #start-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(30, 30, 30, 0.98); z-index: 100;
-            display: flex; justify-content: center; align-items: center;
-            color: white; overflow-y: auto; padding: 10px; box-sizing: border-box;
-        }
-        .start-content {
-            background: #2a2a2a; padding: 20px; border-radius: 15px;
-            max-width: 700px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 2px solid var(--accent); max-height: 95vh; overflow-y: auto;
-        }
-        .start-content h1 { text-align: center; color: var(--accent); margin-top: 0; font-size: 2rem; border-bottom: 2px solid #555; padding-bottom: 10px; }
-        .start-content h3 { color: #4db6ac; margin: 10px 0 5px 0; }
-        .start-content p, .start-content ul { font-size: 0.9rem; margin-bottom: 10px; }
-        
-        #title-content { text-align: center; border: none; background: transparent; box-shadow: none; }
-        #title-content h1 { font-size: 3rem; border: none; text-shadow: 2px 4px 10px rgba(0,0,0,0.5); margin-bottom: 5px; }
-        .subtitle { font-size: 1.2rem; color: #ccc; margin-bottom: 30px; }
-        
-        .recipe-table { width: 100%; border-collapse: collapse; margin: 10px 0; background: white; color: #333; border-radius: 8px; font-size: 0.85rem; }
-        .recipe-table th, .recipe-table td { padding: 6px; border: 1px solid #ddd; text-align: left; }
-        .recipe-table th { background: var(--accent); color: white; text-align: center; }
-        
-        .start-btn { display: block; width: 100%; background: var(--accent); color: white; font-size: 1.2rem; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .pulse-btn { width: 60%; margin: 0 auto; font-size: 1.5rem; padding: 15px; border-radius: 50px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 112, 67, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0); } }
-
-        /* 遊戲主體 */
+        /* 遊戲滿版主體 */
         #game-container {
-            display: none; width: 100%; max-width: 900px; height: 100vh;
-            background: var(--ui-bg); overflow: hidden; display: flex; flex-direction: column;
+            display: none; 
+            width: 100vw; 
+            height: 100vh;
+            max-width: 100%;
+            background: var(--ui-bg); 
+            display: flex; 
+            flex-direction: column;
         }
         
-        .header { background: #4db6ac; color: white; padding: 5px 15px; display: flex; justify-content: space-between; font-size: 1rem; font-weight: bold; z-index: 10;}
-        .sys-msg { background: #ffe082; padding: 5px; text-align: center; font-weight: bold; color: #d84315; font-size: 0.9rem; z-index: 10;}
+        /* 頂部資訊列 (高度固定比例) */
+        .header { 
+            background: #004d40; color: white; padding: 1vh 2vw; 
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: clamp(0.9rem, 2.5vh, 1.2rem); font-weight: bold; z-index: 10;
+            height: 5vh; box-sizing: border-box;
+        }
+        .sys-msg { 
+            background: #b71c1c; padding: 0.5vh; text-align: center; 
+            font-weight: bold; color: white; font-size: clamp(0.8rem, 2vh, 1rem); 
+            z-index: 10; height: 4vh; box-sizing: border-box; display: flex; justify-content: center; align-items: center;
+        }
         
-        .shop-scene { flex: 1; min-height: 120px; background: var(--sky); position: relative; border-bottom: 20px solid var(--floor); overflow: hidden; }
-        .counter { position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: var(--counter-front); border-top: 10px solid var(--counter-top); z-index: 2; }
-        .staff { position: absolute; left: 15%; bottom: 35px; font-size: 60px; z-index: 1; transition: 0.1s; }
-        .making-cup { position: absolute; left: 25%; bottom: 45px; font-size: 30px; z-index: 3; }
-        .customer-queue { position: absolute; right: 2%; bottom: 35px; display: flex; flex-direction: row-reverse; gap: 8px; z-index: 3; }
+        /* 視覺區 (佔據上半部剩餘空間) */
+        .shop-scene { 
+            flex: 1; 
+            background: var(--sky); position: relative; 
+            border-bottom: 3vh solid var(--floor); overflow: hidden; 
+        }
+        .counter { position: absolute; bottom: 0; left: 0; width: 100%; height: 12vh; background: var(--counter-front); border-top: 2vh solid var(--counter-top); z-index: 2; }
+        
+        /* 小人與物件使用 vh 作為單位，確保不被裁切 */
+        .staff { position: absolute; left: 15%; bottom: 8vh; font-size: 18vh; z-index: 1; transition: 0.1s; }
+        .making-cup { position: absolute; left: 24%; bottom: 12vh; font-size: 8vh; z-index: 3; }
+        .customer-queue { position: absolute; right: 2%; bottom: 8vh; display: flex; flex-direction: row-reverse; gap: 2vw; z-index: 3; }
         .customer-wrapper { position: relative; animation: walkIn 0.3s ease-out forwards; }
         @keyframes walkIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        .customer { font-size: 60px; }
+        .customer { font-size: 18vh; }
         
-        /* 客人對話框縮小，讓每個人都能顯示 */
         .speech-bubble {
-            position: absolute; top: -35px; right: 0px; background: white; padding: 2px 5px; border-radius: 8px;
-            border: 2px solid #333; font-size: 0.65rem; font-weight: bold; white-space: nowrap; box-shadow: 1px 1px 0px rgba(0,0,0,0.2); z-index: 4;
+            position: absolute; top: -5vh; right: 0px; background: white; padding: 0.5vh 1vw; border-radius: 8px;
+            border: 2px solid #333; font-size: clamp(0.6rem, 2vh, 1rem); font-weight: bold; white-space: nowrap; box-shadow: 1px 1px 0px rgba(0,0,0,0.2); z-index: 4; color: black;
         }
-        .speech-bubble::after { content: ''; position: absolute; bottom: -6px; right: 10px; border-width: 6px 6px 0 0; border-style: solid; border-color: white transparent transparent transparent; }
+        .speech-bubble::after { content: ''; position: absolute; bottom: -1vh; right: 2vw; border-width: 1vh 1vh 0 0; border-style: solid; border-color: white transparent transparent transparent; }
         
-        /* 客人耐心進度條 */
         .patience-bar {
-            position: absolute; bottom: -10px; left: 0; height: 6px; width: 100%;
-            border-radius: 3px; border: 1px solid #333;
-            /* 動畫時間設定在 JS 寫入 */
-            animation-name: drainPatience;
-            animation-timing-function: linear;
-            animation-fill-mode: forwards;
+            position: absolute; bottom: -1vh; left: 0; height: 1.5vh; width: 100%;
+            border-radius: 1vh; border: 1px solid #333;
+            animation-name: drainPatience; animation-timing-function: linear; animation-fill-mode: forwards;
         }
         @keyframes drainPatience {
             0% { width: 100%; background-color: #4caf50; }
@@ -110,35 +100,75 @@
             100% { width: 0%; background-color: #f44336; }
         }
 
-        .controls-area { display: flex; padding: 5px; gap: 5px; background: var(--ui-bg); height: 45%; }
-        .panel { flex: 1; background: #fff; padding: 8px; border-radius: 8px; border: 2px solid #eee; display: flex; flex-direction: column;}
-        .panel h3 { margin: 0 0 5px 0; color: #333; border-bottom: 2px solid var(--accent); padding-bottom: 3px; font-size: 1rem;}
+        /* 操作面板區 (強制佔據下半部固定比例) */
+        .controls-area { 
+            height: 48vh; /* 給予按鈕區充足的空間 */
+            display: flex; padding: 1vh 1vw; gap: 1vw; background: #222; box-sizing: border-box; 
+        }
+        .panel { 
+            flex: 1; background: #333; padding: 1vh; border-radius: 8px; border: 1px solid #555; 
+            display: flex; flex-direction: column; color: white;
+        }
+        .panel h3 { margin: 0 0 1vh 0; color: #ffccbc; border-bottom: 2px solid var(--accent); padding-bottom: 0.5vh; font-size: clamp(0.9rem, 2.5vh, 1.1rem);}
         
-        .btn-grid { display: flex; flex-wrap: wrap; gap: 3px; }
-        .prep-btn, .ing-btn { flex: 1 1 30%; font-size: 0.85rem; padding: 6px 2px; text-align: center; }
+        /* 使用 CSS Grid 完美切割按鈕空間 */
+        .btn-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            grid-auto-rows: 1fr; /* 讓所有按鈕等高 */
+            gap: 0.8vh 0.8vw; 
+            flex: 1; /* 填滿剩餘高度 */
+        }
 
-        button { background-color: white; color: #333; border: 2px solid #ccc; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.1s; }
-        button:active:not(:disabled) { transform: scale(0.95); border-color: var(--accent); color: var(--accent); }
-        button:disabled { opacity: 0.5; cursor: not-allowed; background: #eee; border-color: #aaa; color: #666; }
+        button { 
+            background-color: #555; color: white; border: 1px solid #777; border-radius: 6px; 
+            cursor: pointer; font-weight: bold; transition: 0.1s; 
+            font-size: clamp(0.7rem, 2.2vh, 1.2rem); 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 0; margin: 0;
+        }
+        button:active:not(:disabled) { transform: scale(0.95); border-color: var(--accent); background-color: #666; }
+        button:disabled { opacity: 0.4; cursor: not-allowed; background: #444; border-color: #333; color: #888; }
         
-        .serve-btn { width: 100%; background-color: #66bb6a; border-color: #388e3c; color: white; margin-top: auto; font-size: 1rem; padding: 10px;}
-        .serve-btn:active:not(:disabled) { background-color: #4caf50; }
+        .inv-text { font-size: clamp(0.6rem, 1.8vh, 0.9rem); color: #aaa; margin-top: 1vh; text-align: center;}
+        .cup-status { margin: 1vh 0; font-weight: bold; color: #ccc; font-size: clamp(0.7rem, 2vh, 1rem); }
+        #cup-result { color: #4caf50; min-height: 3vh; }
+
+        .action-row { display: flex; gap: 1vw; height: 8vh; margin-top: auto;}
+        .serve-btn { flex: 2; background-color: #2e7d32; border-color: #1b5e20; font-size: clamp(1rem, 3vh, 1.5rem);}
+        .serve-btn:active:not(:disabled) { background-color: #388e3c; }
+        .trash-btn { flex: 1; background-color: #c62828; border-color: #b71c1c; }
         
-        #cup-result { margin-top: 2px; font-weight: bold; font-size: 0.9rem; min-height: 20px; }
         .inv-wrap { display: none; }
 
-        /* 結算蓋板 */
-        #overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(20, 20, 20, 0.95); z-index: 100; color: white; text-align: center;
-            flex-direction: column; justify-content: center; align-items: center;
+        /* 開始與結算蓋板 */
+        #start-screen, #overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(10, 10, 10, 0.95); z-index: 100; color: white; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .summary-box { background: #333; padding: 20px; border-radius: 15px; border: 2px solid var(--accent); width: 80%; max-width: 400px;}
-        .summary-box h1 { margin-top: 0; color: #ffca28; }
-        #stars-display { font-size: 3rem; margin: 10px 0; letter-spacing: 5px; }
-        .stat-row { display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 8px; border-bottom: 1px dashed #666; padding-bottom: 4px;}
-        #goal-status { font-weight: bold; font-size: 1.2rem; margin: 15px 0; }
-        .end-btn { font-size: 1.2rem; padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 10px;}
+        #overlay { display: none; }
+        
+        .start-content, .summary-box {
+            background: #2a2a2a; padding: 3vh 3vw; border-radius: 15px;
+            width: 85vw; max-width: 600px; max-height: 90vh; overflow-y: auto;
+            border: 2px solid var(--accent); box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+        }
+        #title-content { border: none; background: transparent; box-shadow: none; }
+        #title-content h1 { font-size: clamp(2rem, 8vh, 4rem); margin-bottom: 1vh; text-shadow: 2px 4px 10px rgba(0,0,0,0.8); }
+        .subtitle { font-size: clamp(1rem, 3vh, 1.5rem); color: #ccc; margin-bottom: 5vh; }
+        
+        .recipe-table { width: 100%; border-collapse: collapse; margin: 2vh 0; background: #eee; color: #111; border-radius: 8px; font-size: clamp(0.7rem, 2.2vh, 1rem); }
+        .recipe-table th, .recipe-table td { padding: 1vh; border: 1px solid #ccc; text-align: left; }
+        .recipe-table th { background: var(--accent); color: white; text-align: center; }
+        
+        .start-btn, .end-btn { display: block; width: 100%; background: var(--accent); color: white; font-size: clamp(1rem, 3vh, 1.5rem); padding: 2vh; border: none; border-radius: 10px; font-weight: bold; margin-top: 1vh;}
+        .pulse-btn { width: 60%; margin: 0 auto; border-radius: 50px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 112, 67, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0); } }
+        
+        #stars-display { font-size: clamp(2.5rem, 6vh, 4rem); margin: 2vh 0; letter-spacing: 1vw; }
+        .stat-row { display: flex; justify-content: space-between; font-size: clamp(1rem, 2.5vh, 1.2rem); margin-bottom: 1vh; border-bottom: 1px dashed #666; padding-bottom: 0.5vh;}
+        #goal-status { font-weight: bold; font-size: clamp(1.2rem, 3vh, 1.5rem); margin: 3vh 0; }
         .retry-btn { background: #757575; }
 
     </style>
@@ -158,22 +188,21 @@
     </div>
 
     <div class="start-content" id="tutorial-content" style="display: none;">
-        <h1>📖 地獄店長指南</h1>
+        <h1 style="color:var(--accent); margin-top:0;">📖 地獄店長指南</h1>
         <h3>🎯 遊戲目的</h3>
-        <p>一天只有 <b>3 分鐘</b>！你必須瘋狂出餐達到每日目標（如 $3000）。</p>
+        <p style="font-size: clamp(0.8rem, 2vh, 1rem);">一天只有 <b>3 分鐘</b>！你必須瘋狂出餐達到每日目標（如 $3000）。</p>
         <h3>🕹️ 殘酷機制</h3>
-        <ul>
-            <li><strong>等太久會跑掉：</strong> 每個客人只有 <b>25 秒</b> 耐心，注意他們腳下的進度條！</li>
-            <li><strong>提早備料：</strong> 現在每位客人頭上都會顯示訂單，開門前 (9:00) 就要狂按備料！</li>
+        <ul style="font-size: clamp(0.8rem, 2vh, 1rem); padding-left: 20px;">
+            <li><strong>等太久會跑掉：</strong> 客人只有 <b>25 秒</b> 耐心，注意腳下進度條！</li>
+            <li><strong>提早備料：</strong> 隨時注意客人頭上點單，善用多指同時點擊備料！</li>
         </ul>
-        <h3>📜 飲料製作表 (配方秘笈)</h3>
         <table class="recipe-table">
             <tr><th>解鎖</th><th>品項</th><th>配料</th></tr>
             <tr><td>D1</td><td>純粹紅茶<br>珍珠奶茶<br>紅茶拿鐵</td><td>紅茶+冰塊<br>珍珠+鮮奶+紅茶+冰塊<br>鮮奶+紅茶+冰塊</td></tr>
             <tr><td>D2</td><td>蘋果紅萱</td><td>蘋果+紅茶+冰塊</td></tr>
             <tr><td>D3</td><td>炸地瓜球</td><td>地瓜球</td></tr>
         </table>
-        <button class="start-btn" style="background: #f44336;" onclick="initGame()">我準備好了，開戰！</button>
+        <button class="start-btn" style="background: #e53935;" onclick="initGame()">我準備好了，開戰！</button>
     </div>
 </div>
 
@@ -185,7 +214,7 @@
         <div style="color: #ffca28;">🎯 目標: $<span id="goal-display">1500</span></div> 
     </div>
     
-    <div class="sys-msg" id="sys-message" style="background: #ef5350; color: white;">早上 9 點！只有幾秒鐘可以備料，快按！</div>
+    <div class="sys-msg" id="sys-message">早上 9 點！只有幾秒鐘可以備料，快按！</div>
 
     <div class="shop-scene">
         <div class="staff" id="staff-char">🧑‍🍳</div>
@@ -198,18 +227,18 @@
         <div class="panel">
             <h3>🛒 備料區</h3>
             <div class="btn-grid">
-                <button class="prep-btn" onclick="prepItem('tea', this)">🍵 泡茶(-$80)</button>
-                <button class="prep-btn" onclick="prepItem('boba', this)">🧋 珍珠(-$120)</button>
-                <button class="prep-btn" onclick="prepItem('ice', this)">🧊 製冰(-$30)</button>
-                <button class="prep-btn" id="prep-milk" onclick="prepItem('milk', this)">🥛 鮮奶(-$150)</button>
-                <button class="prep-btn" id="prep-apple" style="display: none;" onclick="prepItem('apple', this)">🍎 蘋果(-$100)</button>
-                <button class="prep-btn" id="prep-spb" style="display: none;" onclick="prepItem('spb', this)">🍠 地瓜球(-$100)</button>
+                <button class="prep-btn" onclick="prepItem('tea', this)">🍵泡茶<br><small>-$80</small></button>
+                <button class="prep-btn" onclick="prepItem('boba', this)">🧋珍珠<br><small>-$120</small></button>
+                <button class="prep-btn" onclick="prepItem('ice', this)">🧊製冰<br><small>-$30</small></button>
+                <button class="prep-btn" id="prep-milk" onclick="prepItem('milk', this)">🥛鮮奶<br><small>-$150</small></button>
+                <button class="prep-btn" id="prep-apple" style="display: none;" onclick="prepItem('apple', this)">🍎蘋果<br><small>-$100</small></button>
+                <button class="prep-btn" id="prep-spb" style="display: none;" onclick="prepItem('spb', this)">🍠地瓜球<br><small>-$100</small></button>
             </div>
-            <p style="font-size: 0.75rem; color: #666; margin-top: auto;">
-                庫存: 茶<span id="inv-tea">0</span> | 珠<span id="inv-boba">0</span> | 冰<span id="inv-ice">0</span> | 奶<span id="inv-milk">0</span>
+            <div class="inv-text">
+                茶<span id="inv-tea">0</span> | 珠<span id="inv-boba">0</span> | 冰<span id="inv-ice">0</span> | 奶<span id="inv-milk">0</span>
                 <span id="inv-apple-wrap" class="inv-wrap"> | 果<span id="inv-apple">0</span></span>
                 <span id="inv-spb-wrap" class="inv-wrap"> | 薯<span id="inv-spb">0</span></span>
-            </p>
+            </div>
         </div>
 
         <div class="panel">
@@ -222,14 +251,13 @@
                 <button onclick="addIngredient('蘋果')" class="ing-btn" id="add-apple" style="display: none;" disabled>+蘋果</button>
                 <button onclick="addIngredient('地瓜球')" class="ing-btn" id="add-spb" style="display: none;" disabled>+地瓜球</button>
             </div>
-            <div style="margin-top: 5px; font-weight: bold; color: #555; font-size: 0.8rem;">
+            <div class="cup-status">
                 杯中: <span id="cup-preview">空</span>
+                <div id="cup-result"></div>
             </div>
-            <div id="cup-result"></div>
-
-            <div style="display: flex; gap: 5px; margin-top: auto;">
-                <button onclick="clearCup()" style="width: 30%; background: #ffccbc; color: #d84315;">🗑️ 倒掉</button>
-                <button onclick="serveDrink()" id="btn-serve" class="serve-btn" style="width: 70%; margin-top: 0;" disabled>出餐</button>
+            <div class="action-row">
+                <button onclick="clearCup()" class="trash-btn">🗑️ 倒掉</button>
+                <button onclick="serveDrink()" id="btn-serve" class="serve-btn" disabled>出餐</button>
             </div>
         </div>
     </div>
@@ -237,7 +265,7 @@
 
 <div id="overlay">
     <div class="summary-box">
-        <h1>🌙 今日結算</h1>
+        <h1 style="margin:0; color:#ffca28; font-size:clamp(1.5rem, 4vh, 2.5rem);">🌙 今日結算</h1>
         <div id="stars-display">🌑🌑🌑</div>
         
         <div class="stat-row"><span>服務客數：</span> <span id="stat-customers">0</span> 人</div>
@@ -253,7 +281,6 @@
 </div>
 
 <script>
-    // 開局金錢提高至 1000 以應對高通膨
     let gameState = { day: 1, time: 9 * 60, money: 1000, inventory: { tea: 0, boba: 0, ice: 0, milk: 0, apple: 0, spb: 0 }, isOpen: false, isEnded: false, timer: null };
     let dayStartMoney = 1000;
     let dayStartInventory = {};
@@ -261,9 +288,8 @@
 
     let currentCup = [];
     let currentOrders = [];
-    const PATIENCE_TIME_MS = 25000; // 客人耐心 25 秒
+    const PATIENCE_TIME_MS = 25000; 
     
-    // 【修改】目標金額大幅調高
     const DAILY_GOALS = {
         1: { star1: 1500, star2: 2500, star3: 3500 },
         2: { star1: 2000, star2: 3000, star3: 4500 },
@@ -271,7 +297,6 @@
     };
     function getDailyGoal(day) { return DAILY_GOALS[day] || { star1: day * 1000, star2: day * 1500, star3: day * 2000 }; }
 
-    // 【修改】飲料單價大幅提升以配合 3000 的高額目標
     const RECIPES = [
         { name: "純粹紅茶", ingredients: ["紅茶", "冰塊"], price: 50, unlockDay: 1 },
         { name: "珍珠奶茶", ingredients: ["珍珠", "鮮奶", "紅茶", "冰塊"], price: 90, unlockDay: 1 },
@@ -282,7 +307,6 @@
 
     const CUSTOMER_FACES = ['👨', '👩', '👧', '👦', '👵', '👱‍♀️', '👨‍💼', '👩‍🎓'];
     
-    // 備料成本跟著提升
     const PREP_CONFIG = {
         tea: { action: '泡茶', time: 6, cost: 80, icon: '🍵' },
         boba: { action: '煮珍珠', time: 10, cost: 120, icon: '🧋' },
@@ -314,7 +338,6 @@
     }
 
     function startGameTimer() {
-        // 【修改】將計時器調為 230 毫秒，等同於現實 3 分鐘跑完遊戲內的 13 小時
         gameState.timer = setInterval(() => {
             if(gameState.isEnded) return;
             
@@ -324,16 +347,14 @@
 
             if (gameState.time === 9 * 60 + 30) {
                 gameState.isOpen = true;
-                sysMsg("🈺 開門營業！客人湧入了！");
+                sysMsg("🈺 營業時間到！客人湧入了！");
                 enableMakeArea(true);
             }
 
-            // 來客機率稍微調高，且最多可排 6 人
             if (gameState.isOpen && Math.random() < 0.18 && currentOrders.length < 6) {
                 generateCustomer(now);
             }
 
-            // 【新增】耐心機制：檢查是否有客人等太久
             if (gameState.isOpen && currentOrders.length > 0) {
                 let angryCount = 0;
                 currentOrders = currentOrders.filter(order => {
@@ -346,8 +367,8 @@
                 
                 if (angryCount > 0) {
                     dailyStats.customersAngry += angryCount;
-                    sysMsg(`💢 動作太慢！有 ${angryCount} 個客人氣走了！`);
-                    renderCustomers(); // 重新渲染隊列
+                    sysMsg(`💢 太慢了！${angryCount} 個客人氣走了！`);
+                    renderCustomers(); 
                 }
             }
 
@@ -376,7 +397,7 @@
         let config = PREP_CONFIG[itemKey];
 
         if (gameState.money < config.cost) {
-            sysMsg("❌ 錢不夠備料啦！");
+            sysMsg("❌ 錢不夠備料！");
             return;
         }
 
@@ -385,18 +406,18 @@
         
         btnElement.disabled = true;
         let timeLeft = config.time;
-        btnElement.innerText = `⏳ (${timeLeft}s)`;
+        btnElement.innerHTML = `⏳ (${timeLeft}s)`;
 
         let countdownTimer = setInterval(() => {
             timeLeft -= 1;
             if (timeLeft > 0) {
-                btnElement.innerText = `⏳ (${timeLeft}s)`;
+                btnElement.innerHTML = `⏳ (${timeLeft}s)`;
             } else {
                 clearInterval(countdownTimer);
                 gameState.inventory[itemKey] += 10;
                 document.getElementById(`inv-${itemKey}`).innerText = gameState.inventory[itemKey];
                 btnElement.disabled = false;
-                btnElement.innerText = `${config.icon} ${config.action}(-$${config.cost})`;
+                btnElement.innerHTML = `${config.icon}${config.action}<br><small>-$${config.cost}</small>`;
                 staffBounce(); 
             }
         }, 1000); 
@@ -407,7 +428,6 @@
         let randomRecipe = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
         let face = CUSTOMER_FACES[Math.floor(Math.random() * CUSTOMER_FACES.length)];
         
-        // 紀錄生成時間，作為耐心扣除的依據
         currentOrders.push({ id: Date.now(), name: randomRecipe.name, price: randomRecipe.price, face: face, spawnTime: nowTime });
         renderCustomers();
     }
@@ -421,15 +441,11 @@
             let wrapper = document.createElement('div');
             wrapper.className = 'customer-wrapper';
             
-            // 只有最新排隊的人有走進來的動畫
             if (index !== currentOrders.length - 1) {
                 wrapper.style.animation = 'none'; wrapper.style.transform = 'translateX(0)'; wrapper.style.opacity = '1';
             }
             
-            // 為了讓玩家提早備料，現在所有客人頭上都會顯示點單
             let speechHTML = `<div class="speech-bubble">${order.name}</div>`;
-            
-            // 計算已經消耗的耐心時間 (使用負延遲讓 CSS 動畫無縫接軌)
             let ageInSeconds = (nowTime - order.spawnTime) / 1000;
             let patienceBarHTML = `<div class="patience-bar" style="animation-duration: ${PATIENCE_TIME_MS/1000}s; animation-delay: -${ageInSeconds}s;"></div>`;
             
@@ -446,7 +462,7 @@
 
     function staffBounce() {
         const staff = document.getElementById('staff-char');
-        staff.style.transform = 'translateY(-20px)';
+        staff.style.transform = 'translateY(-3vh)';
         setTimeout(() => { staff.style.transform = 'translateY(0)'; }, 150);
     }
 
@@ -460,7 +476,7 @@
             staffBounce();
             updateCupStatus();
         } else {
-            sysMsg(`❌ 【${ingName}】沒了！快備料！`);
+            sysMsg(`❌ 【${ingName}】沒了！`);
         }
     }
 
@@ -563,7 +579,7 @@
                 document.getElementById(`inv-${key}`).innerText = gameState.inventory[key];
             }
         }
-        startDayRoutine(`🔄 重新挑戰第 ${gameState.day} 天！把握時間備料。`);
+        startDayRoutine(`🔄 重新挑戰第 ${gameState.day} 天！快備料！`);
     }
 
     function nextDay() {
@@ -590,7 +606,7 @@
             let config = PREP_CONFIG[key];
             if(prepBtns[index]) {
                 prepBtns[index].disabled = false;
-                prepBtns[index].innerText = `${config.icon} ${config.action}(-$${config.cost})`;
+                prepBtns[index].innerHTML = `${config.icon}${config.action}<br><small>-$${config.cost}</small>`;
             }
         });
         
@@ -606,13 +622,13 @@
 
     function updateUnlockUI() {
         if (gameState.day >= 2) {
-            document.getElementById('prep-apple').style.display = 'inline-block';
-            document.getElementById('add-apple').style.display = 'inline-block';
+            document.getElementById('prep-apple').style.display = 'flex';
+            document.getElementById('add-apple').style.display = 'flex';
             document.getElementById('inv-apple-wrap').style.display = 'inline';
         }
         if (gameState.day >= 3) {
-            document.getElementById('prep-spb').style.display = 'inline-block';
-            document.getElementById('add-spb').style.display = 'inline-block';
+            document.getElementById('prep-spb').style.display = 'flex';
+            document.getElementById('add-spb').style.display = 'flex';
             document.getElementById('inv-spb-wrap').style.display = 'inline';
         }
     }
