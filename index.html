@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手搖職人 Bubble Tea Master</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>手搖職人 Bubble Tea Master - 地獄手速版</title>
     <style>
         :root {
             --sky: #87CEEB;
@@ -15,438 +15,283 @@
         }
         body {
             font-family: '微軟正黑體', 'Segoe UI', sans-serif;
-            background-color: #333;
+            background-color: #222;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            overflow: hidden; 
         }
         
-        /* 開始與教學畫面共用背景 */
+        /* 強制橫屏提示蓋板 */
+        #portrait-warning {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #222; color: white; z-index: 9999;
+            flex-direction: column; justify-content: center; align-items: center;
+            text-align: center;
+        }
+        #portrait-warning div { font-size: 4rem; animation: rotatePhone 1.5s infinite; }
+        @keyframes rotatePhone { 0% { transform: rotate(0deg); } 100% { transform: rotate(90deg); } }
+        
+        @media screen and (orientation: portrait) {
+            #portrait-warning { display: flex; }
+            #start-screen, #game-container, #overlay { display: none !important; }
+        }
+
+        /* 開始與教學畫面 */
         #start-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(30, 30, 30, 0.95);
-            z-index: 100;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            overflow-y: auto;
-            padding: 20px;
-            box-sizing: border-box;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(30, 30, 30, 0.98); z-index: 100;
+            display: flex; justify-content: center; align-items: center;
+            color: white; overflow-y: auto; padding: 10px; box-sizing: border-box;
         }
         .start-content {
-            background: #2a2a2a;
-            padding: 40px;
-            border-radius: 15px;
-            max-width: 700px;
-            width: 100%;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            border: 2px solid var(--accent);
+            background: #2a2a2a; padding: 20px; border-radius: 15px;
+            max-width: 700px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            border: 2px solid var(--accent); max-height: 95vh; overflow-y: auto;
         }
-        .start-content h1 {
-            text-align: center;
-            color: var(--accent);
-            margin-top: 0;
-            border-bottom: 2px solid #555;
-            padding-bottom: 15px;
-        }
-        .start-content h3 { color: #4db6ac; margin-bottom: 10px; }
-        .start-content ul { line-height: 1.6; margin-bottom: 20px; }
+        .start-content h1 { text-align: center; color: var(--accent); margin-top: 0; font-size: 2rem; border-bottom: 2px solid #555; padding-bottom: 10px; }
+        .start-content h3 { color: #4db6ac; margin: 10px 0 5px 0; }
+        .start-content p, .start-content ul { font-size: 0.9rem; margin-bottom: 10px; }
         
-        /* 標題畫面特有樣式 */
-        #title-content {
-            text-align: center;
-            border: none;
-            background: transparent;
-            box-shadow: none;
-        }
-        #title-content h1 {
-            font-size: 4rem;
-            border: none;
-            text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
-            margin-bottom: 5px;
-            line-height: 1.2;
-        }
-        .subtitle {
-            font-size: 1.5rem;
-            color: #ccc;
-            margin-bottom: 50px;
-            letter-spacing: 2px;
-        }
+        #title-content { text-align: center; border: none; background: transparent; box-shadow: none; }
+        #title-content h1 { font-size: 3rem; border: none; text-shadow: 2px 4px 10px rgba(0,0,0,0.5); margin-bottom: 5px; }
+        .subtitle { font-size: 1.2rem; color: #ccc; margin-bottom: 30px; }
         
-        /* 配方表樣式 */
-        .recipe-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0 25px 0;
-            background: white;
-            color: #333;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .recipe-table th, .recipe-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
+        .recipe-table { width: 100%; border-collapse: collapse; margin: 10px 0; background: white; color: #333; border-radius: 8px; font-size: 0.85rem; }
+        .recipe-table th, .recipe-table td { padding: 6px; border: 1px solid #ddd; text-align: left; }
         .recipe-table th { background: var(--accent); color: white; text-align: center; }
-        .recipe-table td:nth-child(1) { text-align: center; font-weight: bold; }
         
-        /* 遊戲按鈕樣式與動畫 */
-        .start-btn {
-            display: block;
-            width: 100%;
-            background: var(--accent);
-            color: white;
-            font-size: 1.5rem;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .start-btn:hover { background: #e64a19; transform: scale(1.02); }
-        
-        .pulse-btn {
-            width: 60%;
-            margin: 0 auto;
-            font-size: 2rem;
-            padding: 20px;
-            border-radius: 50px;
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 112, 67, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0); }
-        }
+        .start-btn { display: block; width: 100%; background: var(--accent); color: white; font-size: 1.2rem; padding: 10px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        .pulse-btn { width: 60%; margin: 0 auto; font-size: 1.5rem; padding: 15px; border-radius: 50px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 112, 67, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 112, 67, 0); } }
 
-        /* 遊戲主體隱藏直到開始 */
+        /* 遊戲主體 */
         #game-container {
-            display: none;
-            width: 100%;
-            max-width: 900px;
-            background: var(--ui-bg);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none; width: 100%; max-width: 900px; height: 100vh;
+            background: var(--ui-bg); overflow: hidden; display: flex; flex-direction: column;
         }
         
-        .header {
-            background: #4db6ac;
-            color: white;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.2rem;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+        .header { background: #4db6ac; color: white; padding: 5px 15px; display: flex; justify-content: space-between; font-size: 1rem; font-weight: bold; z-index: 10;}
+        .sys-msg { background: #ffe082; padding: 5px; text-align: center; font-weight: bold; color: #d84315; font-size: 0.9rem; z-index: 10;}
         
-        .shop-scene {
-            height: 350px;
-            background: var(--sky);
-            position: relative;
-            border-bottom: 30px solid var(--floor);
-            overflow: hidden;
-        }
+        .shop-scene { flex: 1; min-height: 120px; background: var(--sky); position: relative; border-bottom: 20px solid var(--floor); overflow: hidden; }
+        .counter { position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: var(--counter-front); border-top: 10px solid var(--counter-top); z-index: 2; }
+        .staff { position: absolute; left: 15%; bottom: 35px; font-size: 60px; z-index: 1; transition: 0.1s; }
+        .making-cup { position: absolute; left: 25%; bottom: 45px; font-size: 30px; z-index: 3; }
+        .customer-queue { position: absolute; right: 2%; bottom: 35px; display: flex; flex-direction: row-reverse; gap: 8px; z-index: 3; }
+        .customer-wrapper { position: relative; animation: walkIn 0.3s ease-out forwards; }
+        @keyframes walkIn { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .customer { font-size: 60px; }
         
-        .counter {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 90px;
-            background: var(--counter-front);
-            border-top: 15px solid var(--counter-top);
-            z-index: 2;
-        }
-        
-        .staff {
-            position: absolute;
-            left: 15%;
-            bottom: 70px;
-            font-size: 90px;
-            z-index: 1;
-            transition: 0.1s;
-        }
-        
-        .making-cup {
-            position: absolute;
-            left: 25%;
-            bottom: 80px;
-            font-size: 40px;
-            z-index: 3;
-        }
-        
-        .customer-queue {
-            position: absolute;
-            right: 5%;
-            bottom: 80px;
-            display: flex;
-            flex-direction: row-reverse;
-            gap: 15px;
-            z-index: 3;
-        }
-        
-        .customer-wrapper {
-            position: relative;
-            animation: walkIn 0.5s ease-out forwards;
-        }
-        
-        @keyframes walkIn {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .customer { font-size: 80px; }
-        
+        /* 客人對話框縮小，讓每個人都能顯示 */
         .speech-bubble {
-            position: absolute;
-            top: -40px;
-            right: 20px;
-            background: white;
-            padding: 8px 12px;
-            border-radius: 15px;
-            border: 2px solid #333;
-            font-size: 0.9rem;
-            font-weight: bold;
-            white-space: nowrap;
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
-            z-index: 4;
+            position: absolute; top: -35px; right: 0px; background: white; padding: 2px 5px; border-radius: 8px;
+            border: 2px solid #333; font-size: 0.65rem; font-weight: bold; white-space: nowrap; box-shadow: 1px 1px 0px rgba(0,0,0,0.2); z-index: 4;
         }
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            right: 20px;
-            border-width: 10px 10px 0 0;
-            border-style: solid;
-            border-color: white transparent transparent transparent;
-        }
+        .speech-bubble::after { content: ''; position: absolute; bottom: -6px; right: 10px; border-width: 6px 6px 0 0; border-style: solid; border-color: white transparent transparent transparent; }
         
-        .controls-area {
-            display: flex;
-            padding: 20px;
-            gap: 20px;
-            background: var(--ui-bg);
+        /* 客人耐心進度條 */
+        .patience-bar {
+            position: absolute; bottom: -10px; left: 0; height: 6px; width: 100%;
+            border-radius: 3px; border: 1px solid #333;
+            /* 動畫時間設定在 JS 寫入 */
+            animation-name: drainPatience;
+            animation-timing-function: linear;
+            animation-fill-mode: forwards;
         }
-        .panel {
-            flex: 1;
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid #eee;
+        @keyframes drainPatience {
+            0% { width: 100%; background-color: #4caf50; }
+            50% { width: 50%; background-color: #ffeb3b; }
+            80% { width: 20%; background-color: #ff9800; }
+            100% { width: 0%; background-color: #f44336; }
         }
-        .panel h3 { margin-top: 0; color: #333; border-bottom: 2px solid var(--accent); padding-bottom: 5px;}
-        
-        .btn-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        
-        .prep-btn { width: 130px; text-align: center; }
 
-        button {
-            background-color: white;
-            color: #333;
-            border: 2px solid #ccc;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: 0.1s;
-        }
-        button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
-        button:active:not(:disabled) { transform: translateY(0); }
+        .controls-area { display: flex; padding: 5px; gap: 5px; background: var(--ui-bg); height: 45%; }
+        .panel { flex: 1; background: #fff; padding: 8px; border-radius: 8px; border: 2px solid #eee; display: flex; flex-direction: column;}
+        .panel h3 { margin: 0 0 5px 0; color: #333; border-bottom: 2px solid var(--accent); padding-bottom: 3px; font-size: 1rem;}
+        
+        .btn-grid { display: flex; flex-wrap: wrap; gap: 3px; }
+        .prep-btn, .ing-btn { flex: 1 1 30%; font-size: 0.85rem; padding: 6px 2px; text-align: center; }
+
+        button { background-color: white; color: #333; border: 2px solid #ccc; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.1s; }
+        button:active:not(:disabled) { transform: scale(0.95); border-color: var(--accent); color: var(--accent); }
         button:disabled { opacity: 0.5; cursor: not-allowed; background: #eee; border-color: #aaa; color: #666; }
         
-        .serve-btn { width: 100%; background-color: #66bb6a; border-color: #388e3c; color: white; margin-top: 10px; font-size: 1.1rem; padding: 12px;}
-        .serve-btn:hover:not(:disabled) { background-color: #4caf50; color: white; }
+        .serve-btn { width: 100%; background-color: #66bb6a; border-color: #388e3c; color: white; margin-top: auto; font-size: 1rem; padding: 10px;}
+        .serve-btn:active:not(:disabled) { background-color: #4caf50; }
         
-        .sys-msg { background: #ffe082; padding: 10px; text-align: center; font-weight: bold; color: #d84315; }
-        
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 10;
-            color: white;
-            text-align: center;
-            padding-top: 20vh;
-        }
-
-        #cup-result {
-            margin-top: 5px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            min-height: 25px;
-        }
-        
+        #cup-result { margin-top: 2px; font-weight: bold; font-size: 0.9rem; min-height: 20px; }
         .inv-wrap { display: none; }
+
+        /* 結算蓋板 */
+        #overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 20, 20, 0.95); z-index: 100; color: white; text-align: center;
+            flex-direction: column; justify-content: center; align-items: center;
+        }
+        .summary-box { background: #333; padding: 20px; border-radius: 15px; border: 2px solid var(--accent); width: 80%; max-width: 400px;}
+        .summary-box h1 { margin-top: 0; color: #ffca28; }
+        #stars-display { font-size: 3rem; margin: 10px 0; letter-spacing: 5px; }
+        .stat-row { display: flex; justify-content: space-between; font-size: 1.1rem; margin-bottom: 8px; border-bottom: 1px dashed #666; padding-bottom: 4px;}
+        #goal-status { font-weight: bold; font-size: 1.2rem; margin: 15px 0; }
+        .end-btn { font-size: 1.2rem; padding: 12px 20px; background: var(--accent); color: white; border: none; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 10px;}
+        .retry-btn { background: #757575; }
+
     </style>
 </head>
 <body>
 
+<div id="portrait-warning">
+    <div>📱</div>
+    <h2>請將手機轉為橫向遊玩</h2>
+</div>
+
 <div id="start-screen">
-    
     <div class="start-content" id="title-content">
         <h1>🥤 手搖職人<br>Bubble Tea Master</h1>
-        <div class="subtitle">經營你的專屬店面，挑戰手搖飲的最速傳說！</div>
-        <button class="start-btn pulse-btn" onclick="showTutorial()">開始遊戲</button>
+        <div class="subtitle">地獄廚房等級！挑戰你的極限手速！</div>
+        <button class="start-btn pulse-btn" onclick="showTutorial()">開始挑戰</button>
     </div>
 
     <div class="start-content" id="tutorial-content" style="display: none;">
-        <h1 style="font-size: 2.5rem;">📖 新手店長指南</h1>
-        
+        <h1>📖 地獄店長指南</h1>
         <h3>🎯 遊戲目的</h3>
-        <p>你是一位剛上工的飲品店員，必須在營業時間內賺取最大利潤。妥善分配備料與出餐的時間，是經營成功的關鍵。</p>
-        
-        <h3>🕹️ 操作方式</h3>
+        <p>一天只有 <b>3 分鐘</b>！你必須瘋狂出餐達到每日目標（如 $3000）。</p>
+        <h3>🕹️ 殘酷機制</h3>
         <ul>
-            <li><strong>早上 9:00 備料：</strong> 點擊「備料區」補充庫存，每種材料花費的時間不同。</li>
-            <li><strong>早上 9:30 營業：</strong> 依照客人頭上的對話框點單，在「調製區」點擊對應配料。</li>
-            <li><strong>出餐與重做：</strong> 系統會自動預測你調配的飲料，無誤後點擊「完成出餐」。加錯請點「倒掉重做」。</li>
+            <li><strong>等太久會跑掉：</strong> 每個客人只有 <b>25 秒</b> 耐心，注意他們腳下的進度條！</li>
+            <li><strong>提早備料：</strong> 現在每位客人頭上都會顯示訂單，開門前 (9:00) 就要狂按備料！</li>
         </ul>
-
         <h3>📜 飲料製作表 (配方秘笈)</h3>
         <table class="recipe-table">
-            <tr>
-                <th>解鎖日</th>
-                <th>品項名稱</th>
-                <th>需要配料</th>
-            </tr>
-            <tr>
-                <td>第 1 天</td>
-                <td>純粹紅茶<br>珍珠奶茶<br>紅茶拿鐵</td>
-                <td>紅茶 + 冰塊<br>珍珠 + 鮮奶 + 紅茶 + 冰塊<br>鮮奶 + 紅茶 + 冰塊</td>
-            </tr>
-            <tr>
-                <td>第 2 天</td>
-                <td>蘋果紅萱</td>
-                <td>蘋果 + 紅茶 + 冰塊</td>
-            </tr>
-            <tr>
-                <td>第 3 天</td>
-                <td>炸地瓜球</td>
-                <td>地瓜球</td>
-            </tr>
+            <tr><th>解鎖</th><th>品項</th><th>配料</th></tr>
+            <tr><td>D1</td><td>純粹紅茶<br>珍珠奶茶<br>紅茶拿鐵</td><td>紅茶+冰塊<br>珍珠+鮮奶+紅茶+冰塊<br>鮮奶+紅茶+冰塊</td></tr>
+            <tr><td>D2</td><td>蘋果紅萱</td><td>蘋果+紅茶+冰塊</td></tr>
+            <tr><td>D3</td><td>炸地瓜球</td><td>地瓜球</td></tr>
         </table>
-
-        <button class="start-btn" onclick="initGame()">我知道了，開始營業！</button>
+        <button class="start-btn" style="background: #f44336;" onclick="initGame()">我準備好了，開戰！</button>
     </div>
-
 </div>
 
 <div id="game-container">
     <div class="header">
-        <div>📅 第 <span id="day-display">1</span> 天</div>
-        <div>⏰ 時間: <span id="time-display">09:00</span></div>
-        <div>💰 營業額: $<span id="money-display">500</span></div>
+        <div>📅 D<span id="day-display">1</span></div>
+        <div>⏰ <span id="time-display">09:00</span></div>
+        <div>💰 $<span id="money-display">1000</span></div>
+        <div style="color: #ffca28;">🎯 目標: $<span id="goal-display">1500</span></div> 
     </div>
     
-    <div class="sys-msg" id="sys-message">早安！現在是早上 9 點，9點半即將開門，請發揮手速盡快備料！</div>
+    <div class="sys-msg" id="sys-message" style="background: #ef5350; color: white;">早上 9 點！只有幾秒鐘可以備料，快按！</div>
 
     <div class="shop-scene">
         <div class="staff" id="staff-char">🧑‍🍳</div>
         <div class="making-cup" id="cup-visual"></div>
         <div class="counter"></div>
-        
         <div class="customer-queue" id="customer-queue"></div>
     </div>
 
     <div class="controls-area">
         <div class="panel">
-            <h3>🛒 備料區 (需要時間)</h3>
+            <h3>🛒 備料區</h3>
             <div class="btn-grid">
-                <button class="prep-btn" onclick="prepItem('tea', this)">🍵 泡紅茶 (-$50)</button>
-                <button class="prep-btn" onclick="prepItem('boba', this)">🧋 煮珍珠 (-$80)</button>
-                <button class="prep-btn" onclick="prepItem('ice', this)">🧊 製冰 (-$20)</button>
-                <button class="prep-btn" id="prep-milk" onclick="prepItem('milk', this)">🥛 備鮮奶 (-$90)</button>
-                
-                <button class="prep-btn" id="prep-apple" style="display: none;" onclick="prepItem('apple', this)">🍎 切蘋果 (-$60)</button>
-                <button class="prep-btn" id="prep-spb" style="display: none;" onclick="prepItem('spb', this)">🍠 炸地瓜球 (-$70)</button>
+                <button class="prep-btn" onclick="prepItem('tea', this)">🍵 泡茶(-$80)</button>
+                <button class="prep-btn" onclick="prepItem('boba', this)">🧋 珍珠(-$120)</button>
+                <button class="prep-btn" onclick="prepItem('ice', this)">🧊 製冰(-$30)</button>
+                <button class="prep-btn" id="prep-milk" onclick="prepItem('milk', this)">🥛 鮮奶(-$150)</button>
+                <button class="prep-btn" id="prep-apple" style="display: none;" onclick="prepItem('apple', this)">🍎 蘋果(-$100)</button>
+                <button class="prep-btn" id="prep-spb" style="display: none;" onclick="prepItem('spb', this)">🍠 地瓜球(-$100)</button>
             </div>
-            
-            <p style="font-size: 0.9rem; color: #666; margin-top: 15px; line-height: 1.8;">
-                庫存：紅茶(<span id="inv-tea">0</span>) | 珍珠(<span id="inv-boba">0</span>) | 冰塊(<span id="inv-ice">0</span>) | 鮮奶(<span id="inv-milk">0</span>)
-                <span id="inv-apple-wrap" class="inv-wrap"> | 蘋果(<span id="inv-apple">0</span>)</span>
-                <span id="inv-spb-wrap" class="inv-wrap"> | 地瓜球(<span id="inv-spb">0</span>)</span>
+            <p style="font-size: 0.75rem; color: #666; margin-top: auto;">
+                庫存: 茶<span id="inv-tea">0</span> | 珠<span id="inv-boba">0</span> | 冰<span id="inv-ice">0</span> | 奶<span id="inv-milk">0</span>
+                <span id="inv-apple-wrap" class="inv-wrap"> | 果<span id="inv-apple">0</span></span>
+                <span id="inv-spb-wrap" class="inv-wrap"> | 薯<span id="inv-spb">0</span></span>
             </p>
         </div>
 
         <div class="panel">
-            <h3>🥤 調製區 (一鍵直接加，無分類)</h3>
+            <h3>🥤 調製區</h3>
             <div class="btn-grid">
-                <button onclick="addIngredient('紅茶')" class="ing-btn" disabled>加紅茶</button>
-                <button onclick="addIngredient('珍珠')" class="ing-btn" disabled>加珍珠</button>
-                <button onclick="addIngredient('冰塊')" class="ing-btn" disabled>加冰塊</button>
-                <button onclick="addIngredient('鮮奶')" class="ing-btn" id="add-milk" disabled>加鮮奶</button>
-                
-                <button onclick="addIngredient('蘋果')" class="ing-btn" id="add-apple" style="display: none;" disabled>加蘋果</button>
-                <button onclick="addIngredient('地瓜球')" class="ing-btn" id="add-spb" style="display: none;" disabled>裝地瓜球</button>
+                <button onclick="addIngredient('紅茶')" class="ing-btn" disabled>+紅茶</button>
+                <button onclick="addIngredient('珍珠')" class="ing-btn" disabled>+珍珠</button>
+                <button onclick="addIngredient('冰塊')" class="ing-btn" disabled>+冰塊</button>
+                <button onclick="addIngredient('鮮奶')" class="ing-btn" id="add-milk" disabled>+鮮奶</button>
+                <button onclick="addIngredient('蘋果')" class="ing-btn" id="add-apple" style="display: none;" disabled>+蘋果</button>
+                <button onclick="addIngredient('地瓜球')" class="ing-btn" id="add-spb" style="display: none;" disabled>+地瓜球</button>
             </div>
-            <div style="margin-top: 10px; font-weight: bold; color: #555;">
-                目前加入: <span id="cup-preview">空</span>
+            <div style="margin-top: 5px; font-weight: bold; color: #555; font-size: 0.8rem;">
+                杯中: <span id="cup-preview">空</span>
             </div>
             <div id="cup-result"></div>
 
-            <button onclick="clearCup()" style="width: 100%; margin-top: 5px;">🗑️ 倒掉重做</button>
-            <button onclick="serveDrink()" id="btn-serve" class="serve-btn" disabled>✨ 完成出餐 ✨</button>
+            <div style="display: flex; gap: 5px; margin-top: auto;">
+                <button onclick="clearCup()" style="width: 30%; background: #ffccbc; color: #d84315;">🗑️ 倒掉</button>
+                <button onclick="serveDrink()" id="btn-serve" class="serve-btn" style="width: 70%; margin-top: 0;" disabled>出餐</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="overlay">
-    <h1 style="font-size: 3rem; margin-bottom: 10px;">🌙 今日營業結束</h1>
-    <p style="font-size: 1.5rem; margin-bottom: 30px;">辛苦了！趕緊休息，明天繼續拼營業額。</p>
-    <button onclick="nextDay()" style="font-size: 1.5rem; padding: 15px 30px; background: var(--accent); color: white; border: none; border-radius: 10px; cursor: pointer;">進入下一天 ➔</button>
+    <div class="summary-box">
+        <h1>🌙 今日結算</h1>
+        <div id="stars-display">🌑🌑🌑</div>
+        
+        <div class="stat-row"><span>服務客數：</span> <span id="stat-customers">0</span> 人</div>
+        <div class="stat-row"><span>氣走客數：</span> <span style="color: #ef5350;" id="stat-angry">0</span> 人</div>
+        <div class="stat-row"><span>備料支出：</span> <span style="color: #ef5350;">-$<span id="stat-spent">0</span></span></div>
+        <div class="stat-row"><span>今日營收：</span> <span style="color: #66bb6a;">+$<span id="stat-earned">0</span></span></div>
+        
+        <div id="goal-status"></div>
+        
+        <button id="btn-next-day" class="end-btn" onclick="nextDay()">進入下一天 ➔</button>
+        <button id="btn-retry-day" class="end-btn retry-btn" onclick="retryDay()">重新挑戰本日 ↺</button>
+    </div>
 </div>
 
 <script>
-    let gameState = {
-        day: 1,
-        // 【修改】每天起始時間為 9:00 (9 * 60)
-        time: 9 * 60, 
-        money: 500,
-        inventory: { tea: 0, boba: 0, ice: 0, milk: 0, apple: 0, spb: 0 },
-        isOpen: false,
-        isEnded: false,
-        timer: null
-    };
+    // 開局金錢提高至 1000 以應對高通膨
+    let gameState = { day: 1, time: 9 * 60, money: 1000, inventory: { tea: 0, boba: 0, ice: 0, milk: 0, apple: 0, spb: 0 }, isOpen: false, isEnded: false, timer: null };
+    let dayStartMoney = 1000;
+    let dayStartInventory = {};
+    let dailyStats = { spent: 0, earned: 0, customersServed: 0, customersAngry: 0 };
 
     let currentCup = [];
     let currentOrders = [];
+    const PATIENCE_TIME_MS = 25000; // 客人耐心 25 秒
     
+    // 【修改】目標金額大幅調高
+    const DAILY_GOALS = {
+        1: { star1: 1500, star2: 2500, star3: 3500 },
+        2: { star1: 2000, star2: 3000, star3: 4500 },
+        3: { star1: 3000, star2: 4500, star3: 6000 }
+    };
+    function getDailyGoal(day) { return DAILY_GOALS[day] || { star1: day * 1000, star2: day * 1500, star3: day * 2000 }; }
+
+    // 【修改】飲料單價大幅提升以配合 3000 的高額目標
     const RECIPES = [
-        { name: "純粹紅茶", ingredients: ["紅茶", "冰塊"], price: 35, unlockDay: 1 },
-        { name: "珍珠奶茶", ingredients: ["珍珠", "鮮奶", "紅茶", "冰塊"], price: 60, unlockDay: 1 },
-        { name: "紅茶拿鐵", ingredients: ["鮮奶", "紅茶", "冰塊"], price: 75, unlockDay: 1 },
-        { name: "蘋果紅萱", ingredients: ["蘋果", "紅茶", "冰塊"], price: 70, unlockDay: 2 },
-        { name: "炸地瓜球", ingredients: ["地瓜球"], price: 50, unlockDay: 3 }
+        { name: "純粹紅茶", ingredients: ["紅茶", "冰塊"], price: 50, unlockDay: 1 },
+        { name: "珍珠奶茶", ingredients: ["珍珠", "鮮奶", "紅茶", "冰塊"], price: 90, unlockDay: 1 },
+        { name: "紅茶拿鐵", ingredients: ["鮮奶", "紅茶", "冰塊"], price: 110, unlockDay: 1 },
+        { name: "蘋果紅萱", ingredients: ["蘋果", "紅茶", "冰塊"], price: 100, unlockDay: 2 },
+        { name: "炸地瓜球", ingredients: ["地瓜球"], price: 70, unlockDay: 3 }
     ];
 
     const CUSTOMER_FACES = ['👨', '👩', '👧', '👦', '👵', '👱‍♀️', '👨‍💼', '👩‍🎓'];
-
+    
+    // 備料成本跟著提升
     const PREP_CONFIG = {
-        tea: { action: '泡紅茶', time: 6, cost: 50, icon: '🍵' },
-        boba: { action: '煮珍珠', time: 10, cost: 80, icon: '🧋' },
-        ice: { action: '製冰', time: 2, cost: 20, icon: '🧊' },
-        milk: { action: '備鮮奶', time: 3, cost: 90, icon: '🥛' },
-        apple: { action: '切蘋果', time: 4, cost: 60, icon: '🍎' },
-        spb: { action: '炸地瓜球', time: 5, cost: 70, icon: '🍠' }
+        tea: { action: '泡茶', time: 6, cost: 80, icon: '🍵' },
+        boba: { action: '煮珍珠', time: 10, cost: 120, icon: '🧋' },
+        ice: { action: '製冰', time: 2, cost: 30, icon: '🧊' },
+        milk: { action: '鮮奶', time: 3, cost: 150, icon: '🥛' },
+        apple: { action: '蘋果', time: 4, cost: 100, icon: '🍎' },
+        spb: { action: '地瓜球', time: 5, cost: 100, icon: '🍠' }
     };
-
-    const ING_MAP = {
-        '紅茶': 'tea', '珍珠': 'boba', '冰塊': 'ice', '鮮奶': 'milk',
-        '蘋果': 'apple', '地瓜球': 'spb'
-    };
+    const ING_MAP = { '紅茶': 'tea', '珍珠': 'boba', '冰塊': 'ice', '鮮奶': 'milk', '蘋果': 'apple', '地瓜球': 'spb' };
 
     function showTutorial() {
         document.getElementById('title-content').style.display = 'none';
@@ -455,35 +300,61 @@
 
     function initGame() {
         document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('game-container').style.display = 'block';
-        
+        document.getElementById('game-container').style.display = 'flex'; 
+        saveStartOfDayState();
         updateUnlockUI();
+        document.getElementById('goal-display').innerText = getDailyGoal(1).star1;
         startGameTimer();
     }
 
+    function saveStartOfDayState() {
+        dayStartMoney = gameState.money;
+        dayStartInventory = { ...gameState.inventory };
+        dailyStats = { spent: 0, earned: 0, customersServed: 0, customersAngry: 0 };
+    }
+
     function startGameTimer() {
-        // 【修改】將計時器頻率改為 385 毫秒 (約等於 5 分鐘現實時間過完一天)
+        // 【修改】將計時器調為 230 毫秒，等同於現實 3 分鐘跑完遊戲內的 13 小時
         gameState.timer = setInterval(() => {
             if(gameState.isEnded) return;
             
             gameState.time += 1; 
             updateClock();
+            let now = Date.now();
 
-            // 【修改】9:30 開始營業
             if (gameState.time === 9 * 60 + 30) {
                 gameState.isOpen = true;
-                sysMsg("🈺 營業時間到！店門已開，準備迎接客人。");
+                sysMsg("🈺 開門營業！客人湧入了！");
                 enableMakeArea(true);
             }
 
-            if (gameState.isOpen && Math.random() < 0.15 && currentOrders.length < 5) {
-                generateCustomer();
+            // 來客機率稍微調高，且最多可排 6 人
+            if (gameState.isOpen && Math.random() < 0.18 && currentOrders.length < 6) {
+                generateCustomer(now);
+            }
+
+            // 【新增】耐心機制：檢查是否有客人等太久
+            if (gameState.isOpen && currentOrders.length > 0) {
+                let angryCount = 0;
+                currentOrders = currentOrders.filter(order => {
+                    if (now - order.spawnTime > PATIENCE_TIME_MS) {
+                        angryCount++;
+                        return false;
+                    }
+                    return true;
+                });
+                
+                if (angryCount > 0) {
+                    dailyStats.customersAngry += angryCount;
+                    sysMsg(`💢 動作太慢！有 ${angryCount} 個客人氣走了！`);
+                    renderCustomers(); // 重新渲染隊列
+                }
             }
 
             if (gameState.time >= 22 * 60) {
                 endDay();
             }
-        }, 385); 
+        }, 230); 
     }
 
     function updateClock() {
@@ -505,67 +376,64 @@
         let config = PREP_CONFIG[itemKey];
 
         if (gameState.money < config.cost) {
-            sysMsg("❌ 錢不夠了，無法備料！");
+            sysMsg("❌ 錢不夠備料啦！");
             return;
         }
 
         updateMoney(-config.cost);
-        sysMsg(`⏳ 開始${config.action}... 需要 ${config.time} 秒`);
+        dailyStats.spent += config.cost; 
         
         btnElement.disabled = true;
         let timeLeft = config.time;
-        btnElement.innerText = `⏳ 準備中(${timeLeft}s)`;
+        btnElement.innerText = `⏳ (${timeLeft}s)`;
 
         let countdownTimer = setInterval(() => {
             timeLeft -= 1;
-            
             if (timeLeft > 0) {
-                btnElement.innerText = `⏳ 準備中(${timeLeft}s)`;
+                btnElement.innerText = `⏳ (${timeLeft}s)`;
             } else {
                 clearInterval(countdownTimer);
-                
                 gameState.inventory[itemKey] += 10;
                 document.getElementById(`inv-${itemKey}`).innerText = gameState.inventory[itemKey];
-                
                 btnElement.disabled = false;
-                btnElement.innerText = `${config.icon} ${config.action} (-$${config.cost})`;
-                
-                sysMsg(`✅ ${config.action} 完成！庫存 +10`);
+                btnElement.innerText = `${config.icon} ${config.action}(-$${config.cost})`;
                 staffBounce(); 
             }
         }, 1000); 
     }
 
-    function generateCustomer() {
+    function generateCustomer(nowTime) {
         let availableRecipes = RECIPES.filter(r => r.unlockDay <= gameState.day);
         let randomRecipe = availableRecipes[Math.floor(Math.random() * availableRecipes.length)];
         let face = CUSTOMER_FACES[Math.floor(Math.random() * CUSTOMER_FACES.length)];
-        let orderId = Date.now();
         
-        currentOrders.push({ id: orderId, name: randomRecipe.name, price: randomRecipe.price, face: face });
+        // 紀錄生成時間，作為耐心扣除的依據
+        currentOrders.push({ id: Date.now(), name: randomRecipe.name, price: randomRecipe.price, face: face, spawnTime: nowTime });
         renderCustomers();
     }
 
     function renderCustomers() {
         const queue = document.getElementById('customer-queue');
         queue.innerHTML = ''; 
+        let nowTime = Date.now();
         
         currentOrders.forEach((order, index) => {
             let wrapper = document.createElement('div');
             wrapper.className = 'customer-wrapper';
             
+            // 只有最新排隊的人有走進來的動畫
             if (index !== currentOrders.length - 1) {
-                wrapper.style.animation = 'none';
-                wrapper.style.transform = 'translateX(0)';
-                wrapper.style.opacity = '1';
+                wrapper.style.animation = 'none'; wrapper.style.transform = 'translateX(0)'; wrapper.style.opacity = '1';
             }
             
-            let speechHTML = index === 0 ? `<div class="speech-bubble">我要<br>${order.name}！</div>` : '';
+            // 為了讓玩家提早備料，現在所有客人頭上都會顯示點單
+            let speechHTML = `<div class="speech-bubble">${order.name}</div>`;
             
-            wrapper.innerHTML = `
-                ${speechHTML}
-                <div class="customer">${order.face}</div>
-            `;
+            // 計算已經消耗的耐心時間 (使用負延遲讓 CSS 動畫無縫接軌)
+            let ageInSeconds = (nowTime - order.spawnTime) / 1000;
+            let patienceBarHTML = `<div class="patience-bar" style="animation-duration: ${PATIENCE_TIME_MS/1000}s; animation-delay: -${ageInSeconds}s;"></div>`;
+            
+            wrapper.innerHTML = `${speechHTML}<div class="customer">${order.face}</div>${patienceBarHTML}`;
             queue.appendChild(wrapper);
         });
     }
@@ -584,23 +452,15 @@
 
     function addIngredient(ingName) {
         let key = ING_MAP[ingName]; 
-        
         if (gameState.inventory[key] > 0) {
             gameState.inventory[key] -= 1;
             document.getElementById(`inv-${key}`).innerText = gameState.inventory[key];
-            
             currentCup.push(ingName);
-            
-            if (currentCup.length === 1 && currentCup[0] === '地瓜球') {
-                document.getElementById('cup-visual').innerText = '🍠';
-            } else {
-                document.getElementById('cup-visual').innerText = '🥤';
-            }
-            
+            document.getElementById('cup-visual').innerText = (currentCup.length === 1 && currentCup[0] === '地瓜球') ? '🍠' : '🥤';
             staffBounce();
             updateCupStatus();
         } else {
-            sysMsg(`❌ 【${ingName}】庫存不足啦！趕快去備料！`);
+            sysMsg(`❌ 【${ingName}】沒了！快備料！`);
         }
     }
 
@@ -612,41 +472,33 @@
     }
 
     function updateCupStatus() {
-        let previewText = currentCup.length > 0 ? currentCup.join(' + ') : '空';
+        let previewText = currentCup.length > 0 ? currentCup.join('+') : '空';
         document.getElementById('cup-preview').innerText = previewText;
 
         let resultDiv = document.getElementById('cup-result');
-        if (currentCup.length === 0) {
-            resultDiv.innerText = '';
-            return;
-        }
+        if (currentCup.length === 0) { resultDiv.innerText = ''; return; }
 
         let matchedRecipe = RECIPES.find(r => checkRecipe(currentCup, r.ingredients));
-        
         if (matchedRecipe) {
-            resultDiv.innerText = `👉 預計完成：【${matchedRecipe.name}】`;
-            resultDiv.style.color = '#4caf50';
+            resultDiv.innerText = `👉完成: ${matchedRecipe.name}`; resultDiv.style.color = '#4caf50';
         } else {
-            resultDiv.innerText = `👉 預計完成：未知飲料 (配方未完成或錯誤)`;
-            resultDiv.style.color = '#f44336';
+            resultDiv.innerText = `👉未知 (錯誤配方)`; resultDiv.style.color = '#f44336';
         }
     }
 
     function serveDrink() {
-        if (currentOrders.length === 0) {
-            sysMsg("👀 目前沒有客人在等喔！");
-            return;
-        }
-
+        if (currentOrders.length === 0) return;
         let targetOrder = currentOrders[0]; 
         let targetRecipe = RECIPES.find(r => r.name === targetOrder.name);
-        let isCorrect = checkRecipe(currentCup, targetRecipe.ingredients);
-
-        if (isCorrect) {
-            sysMsg(`🎉 成功賣出 ${targetOrder.name}！賺了 $${targetOrder.price}`);
+        
+        if (checkRecipe(currentCup, targetRecipe.ingredients)) {
+            sysMsg(`🎉 賣出 ${targetOrder.name} (+$${targetOrder.price})`);
             updateMoney(targetOrder.price);
+            dailyStats.earned += targetOrder.price; 
+            dailyStats.customersServed += 1;        
         } else {
-            sysMsg("💢 做錯了啦！客人氣呼呼地走掉了...");
+            sysMsg("💢 做錯了啦！氣走一位客人...");
+            dailyStats.customersAngry += 1;
         }
         
         currentOrders.shift(); 
@@ -665,8 +517,91 @@
         gameState.isEnded = true;
         gameState.isOpen = false;
         enableMakeArea(false);
-        document.getElementById('overlay').style.display = 'block';
         clearInterval(gameState.timer);
+        
+        document.getElementById('overlay').style.display = 'flex';
+
+        document.getElementById('stat-customers').innerText = dailyStats.customersServed;
+        document.getElementById('stat-angry').innerText = dailyStats.customersAngry;
+        document.getElementById('stat-spent').innerText = dailyStats.spent;
+        document.getElementById('stat-earned').innerText = dailyStats.earned;
+
+        let goals = getDailyGoal(gameState.day);
+        let stars = 0;
+        if(dailyStats.earned >= goals.star3) stars = 3;
+        else if(dailyStats.earned >= goals.star2) stars = 2;
+        else if(dailyStats.earned >= goals.star1) stars = 1;
+
+        let starsHTML = "";
+        for(let i=0; i<3; i++) { starsHTML += i < stars ? "⭐" : "🌑"; }
+        document.getElementById('stars-display').innerText = starsHTML;
+
+        let goalStatus = document.getElementById('goal-status');
+        let nextBtn = document.getElementById('btn-next-day');
+        let retryBtn = document.getElementById('btn-retry-day');
+
+        if (stars > 0) {
+            goalStatus.innerText = `✅ 達成目標！(底線: $${goals.star1})`;
+            goalStatus.style.color = "#66bb6a";
+            nextBtn.style.display = "block";
+            retryBtn.style.display = "none";
+        } else {
+            goalStatus.innerText = `❌ 未達標... (還差 $${goals.star1 - dailyStats.earned})`;
+            goalStatus.style.color = "#ef5350";
+            nextBtn.style.display = "none";
+            retryBtn.style.display = "block"; 
+        }
+    }
+
+    function retryDay() {
+        gameState.money = dayStartMoney;
+        gameState.inventory = { ...dayStartInventory };
+        updateMoney(0);
+        
+        for(let key in gameState.inventory) {
+            if(document.getElementById(`inv-${key}`)) {
+                document.getElementById(`inv-${key}`).innerText = gameState.inventory[key];
+            }
+        }
+        startDayRoutine(`🔄 重新挑戰第 ${gameState.day} 天！把握時間備料。`);
+    }
+
+    function nextDay() {
+        gameState.day += 1;
+        saveStartOfDayState(); 
+        updateUnlockUI();
+        
+        let unlockMsg = `☀️ 第 ${gameState.day} 天開始！快備料！`;
+        if (gameState.day === 2) unlockMsg = "🎉 解鎖【蘋果】！可以做蘋果紅萱了";
+        if (gameState.day === 3) unlockMsg = "🎉 解鎖【炸地瓜球】！手速要更快了";
+        
+        startDayRoutine(unlockMsg);
+    }
+
+    function startDayRoutine(sysMessage) {
+        gameState.time = 9 * 60;
+        gameState.isEnded = false;
+        currentOrders = [];
+        clearCup();
+        renderCustomers();
+        
+        let prepBtns = document.querySelectorAll('.prep-btn');
+        Object.keys(PREP_CONFIG).forEach((key, index) => {
+            let config = PREP_CONFIG[key];
+            if(prepBtns[index]) {
+                prepBtns[index].disabled = false;
+                prepBtns[index].innerText = `${config.icon} ${config.action}(-$${config.cost})`;
+            }
+        });
+        
+        document.getElementById('day-display').innerText = gameState.day;
+        document.getElementById('goal-display').innerText = getDailyGoal(gameState.day).star1;
+        
+        document.getElementById('overlay').style.display = 'none';
+        
+        sysMsg(sysMessage);
+        updateClock();
+        startGameTimer();
     }
 
     function updateUnlockUI() {
@@ -680,39 +615,6 @@
             document.getElementById('add-spb').style.display = 'inline-block';
             document.getElementById('inv-spb-wrap').style.display = 'inline';
         }
-    }
-
-    function nextDay() {
-        gameState.day += 1;
-        // 【修改】每天起始時間為 9:00
-        gameState.time = 9 * 60;
-        gameState.isEnded = false;
-        currentOrders = [];
-        clearCup();
-        renderCustomers();
-        
-        let prepBtns = document.querySelectorAll('.prep-btn');
-        Object.keys(PREP_CONFIG).forEach((key, index) => {
-            let config = PREP_CONFIG[key];
-            if(prepBtns[index]) {
-                prepBtns[index].disabled = false;
-                prepBtns[index].innerText = `${config.icon} ${config.action} (-$${config.cost})`;
-            }
-        });
-        
-        updateUnlockUI();
-        
-        let unlockMsg = "☀️ 新的一天開始了！早上 9 點，請趕緊備料。";
-        if (gameState.day === 2) unlockMsg = "🎉 第 2 天！解鎖新配料【蘋果】，可以製作蘋果紅萱了！";
-        if (gameState.day === 3) unlockMsg = "🎉 第 3 天！解鎖點心【炸地瓜球】！";
-        if (gameState.day > 3) unlockMsg = `☀️ 第 ${gameState.day} 天開始！今天也要努力賺錢喔！`;
-
-        document.getElementById('day-display').innerText = gameState.day;
-        document.getElementById('overlay').style.display = 'none';
-        sysMsg(unlockMsg);
-        
-        updateClock();
-        startGameTimer();
     }
 </script>
 </body>
